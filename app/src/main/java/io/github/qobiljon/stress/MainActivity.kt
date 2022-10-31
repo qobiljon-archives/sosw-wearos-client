@@ -3,7 +3,6 @@ package io.github.qobiljon.stress
 import android.app.Activity
 import android.content.*
 import android.os.Bundle
-import android.view.View
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
 import kotlinx.android.synthetic.main.activity_main.*
@@ -17,9 +16,8 @@ import java.time.format.DateTimeFormatter
 
 import io.github.qobiljon.etagent.R
 import io.github.qobiljon.etagent.databinding.ActivityMainBinding
-import io.github.qobiljon.stress.sensors.MotionHRService
-import io.github.qobiljon.stress.sensors.OffBodyService
-import io.github.qobiljon.stress.sync.DataSubmissionService
+import io.github.qobiljon.stress.services.sensors.OffBodyService
+import io.github.qobiljon.stress.services.DataSubmissionService
 
 
 class MainActivity : Activity() {

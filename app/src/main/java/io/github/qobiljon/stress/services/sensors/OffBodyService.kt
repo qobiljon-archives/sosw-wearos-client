@@ -1,4 +1,4 @@
-package io.github.qobiljon.stress.sensors
+package io.github.qobiljon.stress.services.sensors
 
 import android.app.*
 import android.content.Context
@@ -29,6 +29,7 @@ class OffBodyService : Service(), SensorEventListener {
     private lateinit var sensorManager: SensorManager
     private lateinit var dataFile: File
     private var sensor: Sensor? = null
+    private var isRunning = false
     // endregion
 
     // region binder
@@ -80,9 +81,12 @@ class OffBodyService : Service(), SensorEventListener {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.e(MainActivity.TAG, "OffBodyService.onStartCommand()")
-
-        if (sensor != null) sensorManager.registerListener(this, sensor, SAMPLING_RATE)
-        return super.onStartCommand(intent, flags, startId)
+        if (isRunning) return START_STICKY
+        else if (sensor != null) {
+            sensorManager.registerListener(this, sensor, SAMPLING_RATE)
+            isRunning = true
+        }
+        return START_STICKY
     }
 
     override fun onSensorChanged(event: SensorEvent?) {

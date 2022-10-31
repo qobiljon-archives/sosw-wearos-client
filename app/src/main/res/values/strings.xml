@@ -12,11 +12,15 @@
     <string name="off_body">(OFF BODY)</string>
 
     <!-- API urls -->
-    <string name="server_host">http://192.168.219.170:8000/api</string>
+    <string name="server_host">http://172.30.1.1:8000/api</string>
 
     <string name="login">%s/api/login</string>
     <string name="register">%s/api/register</string>
 
     <string name="submit_bvp_data">%s/api/submit_bvp_data</string>
     <string name="submit_acc_data">%s/api/submit_acc_data</string>
+
+    <!-- sensor types -->
+    <string name="acc_sensor_type">com.samsung.sensor.hr_raw</string>
+    <string name="bvp_sensor_type">com.samsung.sensor.hr_raw</string>
 </resources>

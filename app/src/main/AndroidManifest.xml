@@ -21,13 +21,13 @@
         android:theme="@android:style/Theme.DeviceDefault">
 
         <service
-            android:name="io.github.qobiljon.stress.sensors.MotionHRService"
+            android:name="io.github.qobiljon.stress.services.sensors.MotionHRService"
             android:exported="false" />
         <service
-            android:name="io.github.qobiljon.stress.sensors.OffBodyService"
+            android:name="io.github.qobiljon.stress.services.sensors.OffBodyService"
             android:exported="false" />
         <service
-            android:name="io.github.qobiljon.stress.sync.DataSubmissionService"
+            android:name="io.github.qobiljon.stress.services.DataSubmissionService"
             android:exported="false" />
 
 

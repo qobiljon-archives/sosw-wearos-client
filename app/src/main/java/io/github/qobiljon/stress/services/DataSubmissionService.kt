@@ -1,4 +1,4 @@
-package io.github.qobiljon.stress.sync
+package io.github.qobiljon.stress.services
 
 import android.app.*
 import android.content.Context
@@ -9,7 +9,9 @@ import android.os.IBinder
 import android.util.Log
 import io.github.qobiljon.etagent.R
 import io.github.qobiljon.stress.MainActivity
+import io.github.qobiljon.stress.utils.Sync
 import io.github.qobiljon.stress.utils.Utils
+import java.io.File
 
 class DataSubmissionService : Service() {
     // region vars
@@ -34,6 +36,34 @@ class DataSubmissionService : Service() {
     override fun onCreate() {
         Log.e(MainActivity.TAG, "DataSubmissionService.onCreate()")
 
+        // data submission thread
+        _thread = Thread {
+            while (isRunning) {
+                if (Utils.isOnline(applicationContext)) {
+                    // submit acc data
+                    val file = File(filesDir, "com.samsung.sensor.hr_raw.csv")
+                    val targetFile = File(filesDir, "com.samsung.sensor_hr_raw_copy.csv")
+                    if (targetFile.exists()) {
+                        Sync.submitAccData(f = targetFile)
+                    }
+                    if (file.exists()) {
+                        file.copyTo(target = targetFile, overwrite = false)
+                    }
+
+                    // submit bvp data
+
+                    // submit off-body data
+
+                }
+
+                try {
+                    Thread.sleep(1000)
+                } catch (e: InterruptedException) {
+                    break
+                }
+            }
+        }
+
         // foreground svc
         val notificationId = 98763
         val notificationIntent = Intent(this, MainActivity::class.java)
@@ -53,22 +83,11 @@ class DataSubmissionService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.e(MainActivity.TAG, "DataSubmissionService.onStartCommand()")
-
-        _thread = Thread {
-            while (isRunning) {
-                if (Utils.isOnline(applicationContext)) {
-
-                }
-
-                try {
-                    Thread.sleep(1000)
-                } catch (e: InterruptedException) {
-                    break
-                }
-            }
+        if (isRunning) return START_STICKY
+        else {
+            isRunning = true
+            _thread.start()
         }
-        isRunning = true
-        _thread.start()
 
         return super.onStartCommand(intent, flags, startId)
     }

@@ -1,4 +1,4 @@
-package io.github.qobiljon.stress.sensors
+package io.github.qobiljon.stress.services.sensors
 
 import android.hardware.SensorEventListener
 import android.app.NotificationChannel
@@ -30,6 +30,7 @@ class MotionHRService : Service(), SensorEventListener {
     private lateinit var sensorManager: SensorManager
     private val dataFiles: MutableMap<Sensor, File> = mutableMapOf()
     private val samplingRates = mapOf("com.samsung.sensor.hr_raw" to SensorManager.SENSOR_DELAY_FASTEST, Sensor.STRING_TYPE_ACCELEROMETER to SensorManager.SENSOR_DELAY_FASTEST)
+    private var isRunning = false
     // endregion
 
     // region binder
@@ -87,8 +88,11 @@ class MotionHRService : Service(), SensorEventListener {
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         Log.e(MainActivity.TAG, "MotionHRService.onStartCommand()")
-
-        dataFiles.forEach { sensor -> samplingRates[sensor.key.stringType]?.let { samplingRate -> sensorManager.registerListener(this, sensor.key, samplingRate) } }
+        if (isRunning) return START_STICKY
+        else {
+            dataFiles.forEach { sensor -> samplingRates[sensor.key.stringType]?.let { samplingRate -> sensorManager.registerListener(this, sensor.key, samplingRate) } }
+            isRunning = true
+        }
 
         return START_STICKY
     }
