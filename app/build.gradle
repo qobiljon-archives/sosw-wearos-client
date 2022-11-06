@@ -1,10 +1,12 @@
 plugins {
     id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
-    id 'org.jetbrains.kotlin.android.extensions'
+    id 'kotlin-android'
+    id 'kotlin-parcelize'
+    id 'kotlin-kapt'
 }
 
 android {
+    namespace 'io.github.qobiljon.stressapp'
     compileSdk 33
 
     defaultConfig {
@@ -28,22 +30,34 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.9.0'
+    // default wearos
+    implementation 'androidx.wear:wear:1.2.0'
     implementation 'com.google.android.gms:play-services-wearable:18.0.0'
+    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'androidx.percentlayout:percentlayout:1.0.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
-    implementation 'androidx.wear:wear:1.2.0'
 
-    // health data
-    implementation 'androidx.health:health-services-client:1.0.0-beta01'
-    implementation "androidx.concurrent:concurrent-futures:1.1.0"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.6.2"
+    // mvp
+    def viewmodel_version = "2.5.1"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$viewmodel_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$viewmodel_version"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$viewmodel_version"
 
     // concurrency
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.2"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2"
+    def kotlinx_coroutines_version = "1.6.4"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinx_coroutines_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinx_coroutines_version"
 
     // retrofit
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    def retrofit_version = "2.9.0"
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+
+    // room
+    def room_version = "2.4.3"
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
 }

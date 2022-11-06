@@ -1,0 +1,18 @@
+package io.github.qobiljon.stressapp.core.data
+
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.Query
+
+@Dao
+interface BVPDataDao {
+    @Query("SELECT * FROM bvpdata;")
+    fun getAll(): List<BVPData>
+
+    @Insert
+    fun insertAll(vararg bvpData: BVPData)
+
+    @Delete
+    fun delete(bvpData: BVPData)
+}

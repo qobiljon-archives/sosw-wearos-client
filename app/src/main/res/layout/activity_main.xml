@@ -8,45 +8,88 @@
     android:keepScreenOn="true"
     android:orientation="vertical"
     android:padding="@dimen/box_inset_layout_padding"
-    tools:context="io.github.qobiljon.stress.MainActivity"
+    tools:context="io.github.qobiljon.stressapp.ui.MainActivity"
     tools:deviceIds="wear">
 
-    <androidx.legacy.widget.Space
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1" />
-
-    <TextView
-        android:id="@+id/tvOffBody"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/off_body" />
 
     <androidx.legacy.widget.Space
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1" />
 
-    <TextView
-        android:id="@+id/tvTime"
+    <LinearLayout
+        android:id="@+id/llAuthentication"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/dummyTime"
-        android:textColor="@android:color/white"
-        android:textSize="@dimen/tvTimeTextSize" />
+        android:orientation="vertical">
 
-    <androidx.legacy.widget.Space
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/full_name" />
 
-    <TextView
-        android:id="@+id/tvDate"
+        <EditText
+            android:id="@+id/etFullName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="@string/dummy_name"
+            android:minWidth="100dp"
+            android:padding="0dp"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/date_of_birth" />
+
+        <EditText
+            android:id="@+id/etDateOfBirth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="@string/date_of_birth_format"
+            android:minWidth="100dp"
+            android:padding="0dp"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/btnAuthenticate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/authenticate" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llDateTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/dummyDate"
-        android:textColor="@android:color/white"
-        android:textSize="@dimen/tvDateTextSize" />
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tvOffBody"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/off_body" />
+
+        <TextView
+            android:id="@+id/tvTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dummyTime"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/tvTimeTextSize" />
+
+        <TextView
+            android:id="@+id/tvDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dummyDate"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/tvDateTextSize" />
+
+    </LinearLayout>
 
     <androidx.legacy.widget.Space
         android:layout_width="wrap_content"
