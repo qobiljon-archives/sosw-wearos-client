@@ -93,15 +93,11 @@ object Storage {
     }
 
     fun setFullName(context: Context, fullName: String) {
-        getSharedPreferences(context).edit {
-            putString(KEY_FULL_NAME, fullName)
-        }
+        getSharedPreferences(context).edit { putString(KEY_FULL_NAME, fullName) }
     }
 
     fun setDateOfBirth(context: Context, dateOfBirth: String) {
-        getSharedPreferences(context).edit {
-            putString(KEY_DATE_OF_BIRTH, dateOfBirth)
-        }
+        getSharedPreferences(context).edit { putString(KEY_DATE_OF_BIRTH, dateOfBirth) }
     }
 
     private fun getFullName(context: Context): String {
