@@ -16,6 +16,7 @@ object Storage {
     private const val KEY_PREFS_NAME = "shared_prefs"
     private const val KEY_FULL_NAME = "full_name"
     private const val KEY_DATE_OF_BIRTH = "date_of_birth"
+    private const val BATCH_SUBMIT_AMOUNT = 100
 
     private lateinit var db: AppDatabase
 
@@ -34,37 +35,55 @@ object Storage {
             val accDataDao = db.accDataDao()
             launch {
                 val allAccData = accDataDao.getAll()
-                val success = Api.submitAccData(
-                    context,
-                    fullName = getFullName(context),
-                    dateOfBirth = getDateOfBirth(context),
-                    accData = allAccData,
-                )
-                if (success) allAccData.forEach { accDataDao.delete(it) }
+                var idx = 0
+                while (idx < allAccData.size) {
+                    val chunk = allAccData.subList(idx, minOf(idx + BATCH_SUBMIT_AMOUNT, allAccData.size))
+                    val success = Api.submitAccData(
+                        context,
+                        fullName = getFullName(context),
+                        dateOfBirth = getDateOfBirth(context),
+                        accData = chunk,
+                    )
+                    if (success) chunk.forEach { accDataDao.delete(it) }
+                    else break
+                    idx += BATCH_SUBMIT_AMOUNT
+                }
             }
 
             val bvpDataDao = db.bvpDataDao()
             launch {
                 val allBVPData = bvpDataDao.getAll()
-                val success = Api.submitBVPData(
-                    context,
-                    fullName = getFullName(context),
-                    dateOfBirth = getDateOfBirth(context),
-                    bvpData = allBVPData,
-                )
-                if (success) allBVPData.forEach { bvpDataDao.delete(it) }
+                var idx = 0
+                while (idx < allBVPData.size) {
+                    val chunk = allBVPData.subList(idx, minOf(idx + BATCH_SUBMIT_AMOUNT, allBVPData.size))
+                    val success = Api.submitBVPData(
+                        context,
+                        fullName = getFullName(context),
+                        dateOfBirth = getDateOfBirth(context),
+                        bvpData = chunk,
+                    )
+                    if (success) chunk.forEach { bvpDataDao.delete(it) }
+                    else break
+                    idx += BATCH_SUBMIT_AMOUNT
+                }
             }
 
             val offBodyDao = db.offBodyDataDao()
             launch {
                 val allOffBodyData = offBodyDao.getAll()
-                val success = Api.submitOffBodyData(
-                    context,
-                    fullName = getFullName(context),
-                    dateOfBirth = getDateOfBirth(context),
-                    offBodyData = allOffBodyData,
-                )
-                if (success) allOffBodyData.forEach { offBodyDao.delete(it) }
+                var idx = 0
+                while (idx < allOffBodyData.size) {
+                    val chunk = allOffBodyData.subList(idx, minOf(idx + BATCH_SUBMIT_AMOUNT, allOffBodyData.size))
+                    val success = Api.submitOffBodyData(
+                        context,
+                        fullName = getFullName(context),
+                        dateOfBirth = getDateOfBirth(context),
+                        offBodyData = chunk,
+                    )
+                    if (success) chunk.forEach { offBodyDao.delete(it) }
+                    else break
+                    idx += BATCH_SUBMIT_AMOUNT
+                }
             }
         }
     }

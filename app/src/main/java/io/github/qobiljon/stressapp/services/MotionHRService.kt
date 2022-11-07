@@ -86,6 +86,8 @@ class MotionHRService : Service(), SensorEventListener {
     }
 
     override fun onSensorChanged(event: SensorEvent) {
+        if (event.values.isEmpty()) return
+
         when (event.sensor.stringType) {
             SENSOR_ACC -> Storage.saveAccData(
                 AccData(
