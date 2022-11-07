@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">Stress Detection</string>
+    <string name="app_name">Stress data collection app</string>
 
     <!-- API urls -->
-    <string name="api_base_url" translatable="false">http://172.30.1.77:8000/api/</string>
+    <string name="api_base_url" translatable="false">http://20.0.0.65:8000/api/</string>
 
     <!-- Room -->
     <string name="room_db_name" translatable="false">app-database</string>
@@ -25,5 +25,6 @@
 
     <string name="authenticate">OK</string>
     <string name="auth_success">Authenticated successfully</string>
-    <string name="auth_failure">Failed to authenticate, please check your internet connection!</string>
+    <string name="auth_failure">Failed, try again please!</string>
+    <string name="input_failure">Please check the inputs!</string>
 </resources>

@@ -15,4 +15,7 @@ interface ApiInterface {
 
     @POST("submit_acc")
     suspend fun submitAccData(@Body submitAccDataRequest: SubmitAccDataRequest): Response<Void>
+
+    @POST("submit_off_body")
+    suspend fun submitOffBodyData(@Body submitOffBodyDataRequest: SubmitOffBodyDataRequest): Response<Void>
 }
