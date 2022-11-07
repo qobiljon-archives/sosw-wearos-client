@@ -1,31 +1,22 @@
 package io.github.qobiljon.stressapp.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.widget.Toast
+import java.text.SimpleDateFormat
+import java.time.Instant
 import java.util.*
 
 object Utils {
-    fun isOnline(context: Context): Boolean {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
-        if (capabilities != null) {
-            if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) return true
-            else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) return true
-            else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) return true
-        }
-        return false
-    }
-
+    @SuppressLint("SimpleDateFormat")
     fun validDate(dateStr: String): Boolean {
         if (dateStr.length != 8) return false
 
         try {
-            val year = Integer.parseInt(dateStr.substring(0, 4))
-            val month = Integer.parseInt(dateStr.substring(4, 6))
-            val day = Integer.parseInt(dateStr.substring(6, 8))
-            Date(year, month, day)
+            val df = SimpleDateFormat("yyyyMMdd")
+            df.isLenient = false
+            val date = df.parse(dateStr)
+            if (date == null || !date.before(Date.from(Instant.now()))) return false
         } catch (e: Exception) {
             return false
         }

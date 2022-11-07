@@ -6,10 +6,14 @@ import io.github.qobiljon.stressapp.core.api.ApiInterface
 import io.github.qobiljon.stressapp.core.api.requests.AuthRequest
 import io.github.qobiljon.stressapp.core.api.requests.SubmitAccDataRequest
 import io.github.qobiljon.stressapp.core.api.requests.SubmitBVPDataRequest
+import io.github.qobiljon.stressapp.core.api.requests.SubmitOffBodyDataRequest
 import io.github.qobiljon.stressapp.core.data.AccData
 import io.github.qobiljon.stressapp.core.data.BVPData
+import io.github.qobiljon.stressapp.core.data.OffBodyData
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.net.ConnectException
+import java.net.SocketTimeoutException
 
 object Api {
     private fun getApiInterface(context: Context): ApiInterface {
@@ -17,13 +21,19 @@ object Api {
     }
 
     suspend fun authenticate(context: Context, fullName: String, dateOfBirth: String): Boolean {
-        val result = getApiInterface(context).authenticate(
-            AuthRequest(
-                full_name = fullName,
-                date_of_birth = dateOfBirth,
+        return try {
+            val result = getApiInterface(context).authenticate(
+                AuthRequest(
+                    full_name = fullName,
+                    date_of_birth = dateOfBirth,
+                )
             )
-        )
-        return result.errorBody() == null
+            result.errorBody() == null && result.isSuccessful && result.body()?.success == true
+        } catch (e: ConnectException) {
+            false
+        } catch (e: SocketTimeoutException) {
+            false
+        }
     }
 
     suspend fun submitAccData(context: Context, fullName: String, dateOfBirth: String, accData: List<AccData>): Boolean {
@@ -36,7 +46,9 @@ object Api {
                 )
             )
             result.errorBody() == null && result.isSuccessful
-        } catch (e: Exception) {
+        } catch (e: ConnectException) {
+            false
+        } catch (e: SocketTimeoutException) {
             false
         }
     }
@@ -51,7 +63,26 @@ object Api {
                 )
             )
             result.errorBody() == null && result.isSuccessful
-        } catch (e: Exception) {
+        } catch (e: ConnectException) {
+            false
+        } catch (e: SocketTimeoutException) {
+            false
+        }
+    }
+
+    suspend fun submitOffBodyData(context: Context, fullName: String, dateOfBirth: String, offBodyData: List<OffBodyData>): Boolean {
+        return try {
+            val result = getApiInterface(context).submitOffBodyData(
+                SubmitOffBodyDataRequest(
+                    full_name = fullName,
+                    date_of_birth = dateOfBirth,
+                    off_body_data = offBodyData,
+                )
+            )
+            result.errorBody() == null && result.isSuccessful
+        } catch (e: ConnectException) {
+            false
+        } catch (e: SocketTimeoutException) {
             false
         }
     }

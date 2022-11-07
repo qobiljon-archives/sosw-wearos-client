@@ -13,7 +13,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.github.qobiljon.etagent.R
 import io.github.qobiljon.etagent.databinding.ActivityMainBinding
-import io.github.qobiljon.stressapp.core.services.sensors.OffBodyService
+import io.github.qobiljon.stressapp.services.DataSubmissionService
+import io.github.qobiljon.stressapp.services.OffBodyService
 import io.github.qobiljon.stressapp.utils.Api
 import io.github.qobiljon.stressapp.utils.Storage
 import io.github.qobiljon.stressapp.utils.Utils
@@ -64,6 +65,7 @@ class MainActivity : AppCompatActivity() {
         val etDateOfBirth = findViewById<EditText>(R.id.etDateOfBirth)
         val btnAuthenticate = findViewById<Button>(R.id.btnAuthenticate)
         btnAuthenticate.setOnClickListener {
+            btnAuthenticate.isEnabled = false
             val fullName = etFullName.text.toString()
             val dateOfBirth = etDateOfBirth.text.toString()
             if (fullName.length >= 3 && Utils.validDate(dateOfBirth)) {
@@ -74,18 +76,24 @@ class MainActivity : AppCompatActivity() {
                         dateOfBirth = dateOfBirth,
                     )
                     if (success) {
+                        llAuthentication.visibility = View.GONE
+                        llDateTime.visibility = View.VISIBLE
+                        btnAuthenticate.isEnabled = true
+
                         Storage.setFullName(applicationContext, fullName = fullName)
                         Storage.setDateOfBirth(applicationContext, dateOfBirth = dateOfBirth)
-                        Utils.toast(applicationContext, getString(R.string.auth_success))
+                        isRunning = true
+                        runServices()
 
-                        if (Storage.isAuthenticated(applicationContext)) {
-                            llAuthentication.visibility = View.GONE
-                            llDateTime.visibility = View.VISIBLE
-                            isRunning = true
-                            runServices()
-                        }
-                    } else Utils.toast(applicationContext, getString(R.string.auth_failure))
+                        Utils.toast(applicationContext, getString(R.string.auth_success))
+                    } else {
+                        btnAuthenticate.isEnabled = true
+                        Utils.toast(applicationContext, getString(R.string.auth_failure))
+                    }
                 }
+            } else {
+                btnAuthenticate.isEnabled = true
+                Utils.toast(applicationContext, getString(R.string.input_failure))
             }
         }
     }
@@ -93,11 +101,14 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        if (Storage.isAuthenticated(applicationContext) && !isRunning) {
+        if (Storage.isAuthenticated(applicationContext)) {
             llAuthentication.visibility = View.GONE
             llDateTime.visibility = View.VISIBLE
-            isRunning = true
-            runServices()
+
+            if (!isRunning) {
+                isRunning = true
+                runServices()
+            }
         }
     }
 
@@ -105,6 +116,7 @@ class MainActivity : AppCompatActivity() {
     private fun runServices() {
         // off-body service
         startForegroundService(Intent(applicationContext, OffBodyService::class.java))
+        startForegroundService(Intent(applicationContext, DataSubmissionService::class.java))
         LocalBroadcastManager.getInstance(applicationContext).registerReceiver(offBodyEventReceiver, IntentFilter("off-body-event"))
 
         GlobalScope.launch {
@@ -113,7 +125,7 @@ class MainActivity : AppCompatActivity() {
 
             while (true) {
                 runOnUiThread {
-                    val dateTime = DateTimeFormatter.ofPattern("EE MM.dd, KK:mm a").format(LocalDateTime.now()).split(", ")
+                    val dateTime = DateTimeFormatter.ofPattern("MM.dd (EE), hh:mm a").format(LocalDateTime.now()).split(", ")
                     tvDate.text = dateTime[0]
                     tvTime.text = dateTime[1]
                 }

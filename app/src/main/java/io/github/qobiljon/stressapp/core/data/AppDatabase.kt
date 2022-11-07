@@ -7,9 +7,11 @@ import androidx.room.RoomDatabase
     entities = [
         AccData::class,
         BVPData::class,
+        OffBodyData::class,
     ], version = 1
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun accDataDao(): AccDataDao
     abstract fun bvpDataDao(): BVPDataDao
+    abstract fun offBodyDataDao(): OffBodyDataDao
 }

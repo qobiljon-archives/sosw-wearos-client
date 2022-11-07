@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 
 
 @Entity
-data class BVPData(
+data class OffBodyData(
     @PrimaryKey val timestamp: Long,
-    @ColumnInfo(name = "light_intensity") val light_intensity: Float,
+    @ColumnInfo(name = "is_off_body") val is_off_body: Boolean,
 )

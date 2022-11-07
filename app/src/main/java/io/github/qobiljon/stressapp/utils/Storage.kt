@@ -7,6 +7,9 @@ import androidx.room.Room
 import io.github.qobiljon.etagent.R
 import io.github.qobiljon.stressapp.core.data.AccData
 import io.github.qobiljon.stressapp.core.data.AppDatabase
+import io.github.qobiljon.stressapp.core.data.BVPData
+import io.github.qobiljon.stressapp.core.data.OffBodyData
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 object Storage {
@@ -27,47 +30,47 @@ object Storage {
     fun syncToCloud(context: Context) {
         if (!isAuthenticated(context)) return
 
-        var stop = false
-
-        val accDataDao = db.accDataDao()
         runBlocking {
-            val allAccData = accDataDao.getAll()
-            val success = Api.submitAccData(
-                context,
-                fullName = getFullName(context),
-                dateOfBirth = getDateOfBirth(context),
-                accData = allAccData,
-            )
-            if (success) allAccData.forEach { accDataDao.delete(it) }
-            else stop = true
-        }
-        if (stop) return
+            val accDataDao = db.accDataDao()
+            launch {
+                val allAccData = accDataDao.getAll()
+                val success = Api.submitAccData(
+                    context,
+                    fullName = getFullName(context),
+                    dateOfBirth = getDateOfBirth(context),
+                    accData = allAccData,
+                )
+                if (success) allAccData.forEach { accDataDao.delete(it) }
+            }
 
-        val bvpDataDao = db.bvpDataDao()
-        runBlocking {
-            val allBVPData = bvpDataDao.getAll()
-            val success = Api.submitBVPData(
-                context,
-                fullName = getFullName(context),
-                dateOfBirth = getDateOfBirth(context),
-                bvpData = allBVPData,
-            )
-            if (success) allBVPData.forEach { bvpDataDao.delete(it) }
-            else stop = true
+            val bvpDataDao = db.bvpDataDao()
+            launch {
+                val allBVPData = bvpDataDao.getAll()
+                val success = Api.submitBVPData(
+                    context,
+                    fullName = getFullName(context),
+                    dateOfBirth = getDateOfBirth(context),
+                    bvpData = allBVPData,
+                )
+                if (success) allBVPData.forEach { bvpDataDao.delete(it) }
+            }
+
+            val offBodyDao = db.offBodyDataDao()
+            launch {
+                val allOffBodyData = offBodyDao.getAll()
+                val success = Api.submitOffBodyData(
+                    context,
+                    fullName = getFullName(context),
+                    dateOfBirth = getDateOfBirth(context),
+                    offBodyData = allOffBodyData,
+                )
+                if (success) allOffBodyData.forEach { offBodyDao.delete(it) }
+            }
         }
-        if (stop) return
     }
 
     fun isAuthenticated(context: Context): Boolean {
         return getSharedPreferences(context).getString(KEY_FULL_NAME, null) != null && getSharedPreferences(context).getString(KEY_DATE_OF_BIRTH, null) != null
-    }
-
-    fun getFullName(context: Context): String {
-        return getSharedPreferences(context).getString(KEY_FULL_NAME, null)!!
-    }
-
-    fun getDateOfBirth(context: Context): String {
-        return getSharedPreferences(context).getString(KEY_DATE_OF_BIRTH, null)!!
     }
 
     fun setFullName(context: Context, fullName: String) {
@@ -82,7 +85,23 @@ object Storage {
         }
     }
 
+    private fun getFullName(context: Context): String {
+        return getSharedPreferences(context).getString(KEY_FULL_NAME, null)!!
+    }
+
+    private fun getDateOfBirth(context: Context): String {
+        return getSharedPreferences(context).getString(KEY_DATE_OF_BIRTH, null)!!
+    }
+
     fun saveAccData(accData: AccData) {
         db.accDataDao().insertAll(accData)
+    }
+
+    fun saveBVPData(bvpData: BVPData) {
+        db.bvpDataDao().insertAll(bvpData)
+    }
+
+    fun saveOffBodyData(offBodyData: OffBodyData) {
+        db.offBodyDataDao().insertAll(offBodyData)
     }
 }
