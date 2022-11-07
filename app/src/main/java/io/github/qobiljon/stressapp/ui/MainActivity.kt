@@ -11,8 +11,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import io.github.qobiljon.etagent.R
-import io.github.qobiljon.etagent.databinding.ActivityMainBinding
+import io.github.qobiljon.stressapp.R
+import io.github.qobiljon.stressapp.databinding.ActivityMainBinding
 import io.github.qobiljon.stressapp.services.DataSubmissionService
 import io.github.qobiljon.stressapp.services.OffBodyService
 import io.github.qobiljon.stressapp.utils.Api
@@ -28,7 +28,7 @@ import java.time.format.DateTimeFormatter
 
 class MainActivity : AppCompatActivity() {
     companion object {
-        const val TAG = "EasyTrackAgent"
+        const val TAG = "StressApp"
     }
 
     private lateinit var binding: ActivityMainBinding

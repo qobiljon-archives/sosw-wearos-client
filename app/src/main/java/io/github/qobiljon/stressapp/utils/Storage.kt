@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.room.Room
-import io.github.qobiljon.etagent.R
+import io.github.qobiljon.stressapp.R
 import io.github.qobiljon.stressapp.core.data.AccData
 import io.github.qobiljon.stressapp.core.data.AppDatabase
 import io.github.qobiljon.stressapp.core.data.BVPData

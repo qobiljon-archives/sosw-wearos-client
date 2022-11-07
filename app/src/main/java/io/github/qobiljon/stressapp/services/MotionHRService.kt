@@ -11,7 +11,7 @@ import android.hardware.SensorManager
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
-import io.github.qobiljon.etagent.R
+import io.github.qobiljon.stressapp.R
 import io.github.qobiljon.stressapp.core.data.AccData
 import io.github.qobiljon.stressapp.core.data.BVPData
 import io.github.qobiljon.stressapp.ui.MainActivity

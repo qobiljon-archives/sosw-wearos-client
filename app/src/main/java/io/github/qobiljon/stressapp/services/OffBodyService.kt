@@ -12,7 +12,7 @@ import android.os.Binder
 import android.os.IBinder
 import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import io.github.qobiljon.etagent.R
+import io.github.qobiljon.stressapp.R
 import io.github.qobiljon.stressapp.core.data.OffBodyData
 import io.github.qobiljon.stressapp.ui.MainActivity
 import io.github.qobiljon.stressapp.utils.Storage

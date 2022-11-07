@@ -7,7 +7,7 @@ import android.graphics.Color
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
-import io.github.qobiljon.etagent.R
+import io.github.qobiljon.stressapp.R
 import io.github.qobiljon.stressapp.ui.MainActivity
 import io.github.qobiljon.stressapp.utils.Storage
 import java.util.*

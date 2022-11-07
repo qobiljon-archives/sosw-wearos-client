@@ -9,6 +9,5 @@ class AndroidApplication : Application() {
         super.onCreate()
 
         Storage.init(applicationContext)
-        Storage.syncToCloud(applicationContext)
     }
 }

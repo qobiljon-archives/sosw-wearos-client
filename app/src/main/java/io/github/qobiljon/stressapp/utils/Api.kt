@@ -1,7 +1,7 @@
 package io.github.qobiljon.stressapp.utils
 
 import android.content.Context
-import io.github.qobiljon.etagent.R
+import io.github.qobiljon.stressapp.R
 import io.github.qobiljon.stressapp.core.api.ApiInterface
 import io.github.qobiljon.stressapp.core.api.requests.AuthRequest
 import io.github.qobiljon.stressapp.core.api.requests.SubmitAccDataRequest
