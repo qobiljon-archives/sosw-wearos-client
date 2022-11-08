@@ -34,10 +34,11 @@ object Storage {
         runBlocking {
             val accDataDao = db.accDataDao()
             launch {
-                val allAccData = accDataDao.getAll()
-                var idx = 0
-                while (idx < allAccData.size) {
-                    val chunk = allAccData.subList(idx, minOf(idx + BATCH_SUBMIT_AMOUNT, allAccData.size))
+                var chunk: List<AccData>
+                do {
+                    chunk = accDataDao.getK(k = BATCH_SUBMIT_AMOUNT)
+                    if (chunk.isEmpty()) break
+
                     val success = Api.submitAccData(
                         context,
                         fullName = getFullName(context),
@@ -46,16 +47,16 @@ object Storage {
                     )
                     if (success) chunk.forEach { accDataDao.delete(it) }
                     else break
-                    idx += BATCH_SUBMIT_AMOUNT
-                }
+                } while (chunk.size == BATCH_SUBMIT_AMOUNT)
             }
 
             val bvpDataDao = db.bvpDataDao()
             launch {
-                val allBVPData = bvpDataDao.getAll()
-                var idx = 0
-                while (idx < allBVPData.size) {
-                    val chunk = allBVPData.subList(idx, minOf(idx + BATCH_SUBMIT_AMOUNT, allBVPData.size))
+                var chunk: List<BVPData>
+                do {
+                    chunk = bvpDataDao.getK(k = BATCH_SUBMIT_AMOUNT)
+                    if (chunk.isEmpty()) break
+
                     val success = Api.submitBVPData(
                         context,
                         fullName = getFullName(context),
@@ -64,16 +65,16 @@ object Storage {
                     )
                     if (success) chunk.forEach { bvpDataDao.delete(it) }
                     else break
-                    idx += BATCH_SUBMIT_AMOUNT
-                }
+                } while (chunk.size == BATCH_SUBMIT_AMOUNT)
             }
 
             val offBodyDao = db.offBodyDataDao()
             launch {
-                val allOffBodyData = offBodyDao.getAll()
-                var idx = 0
-                while (idx < allOffBodyData.size) {
-                    val chunk = allOffBodyData.subList(idx, minOf(idx + BATCH_SUBMIT_AMOUNT, allOffBodyData.size))
+                var chunk: List<OffBodyData>
+                do {
+                    chunk = offBodyDao.getK(k = BATCH_SUBMIT_AMOUNT)
+                    if (chunk.isEmpty()) break
+
                     val success = Api.submitOffBodyData(
                         context,
                         fullName = getFullName(context),
@@ -82,8 +83,7 @@ object Storage {
                     )
                     if (success) chunk.forEach { offBodyDao.delete(it) }
                     else break
-                    idx += BATCH_SUBMIT_AMOUNT
-                }
+                } while (chunk.size == BATCH_SUBMIT_AMOUNT)
             }
         }
     }

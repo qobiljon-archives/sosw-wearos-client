@@ -10,6 +10,9 @@ interface BVPDataDao {
     @Query("SELECT * FROM bvpdata;")
     fun getAll(): List<BVPData>
 
+    @Query("SELECT * FROM bvpdata ORDER BY timestamp ASC LIMIT :k")
+    fun getK(k: Int): List<BVPData>
+
     @Insert
     fun insertAll(vararg bvpData: BVPData)
 

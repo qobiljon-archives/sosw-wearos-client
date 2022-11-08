@@ -10,6 +10,9 @@ interface AccDataDao {
     @Query("SELECT * FROM accdata;")
     fun getAll(): List<AccData>
 
+    @Query("SELECT * FROM accdata ORDER BY timestamp ASC LIMIT :k")
+    fun getK(k: Int): List<AccData>
+
     @Insert
     fun insertAll(vararg acceleration: AccData)
 

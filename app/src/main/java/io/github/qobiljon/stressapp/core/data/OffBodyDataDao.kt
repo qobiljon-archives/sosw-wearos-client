@@ -10,6 +10,9 @@ interface OffBodyDataDao {
     @Query("SELECT * FROM offbodydata;")
     fun getAll(): List<OffBodyData>
 
+    @Query("SELECT * FROM offbodydata ORDER BY timestamp ASC LIMIT :k")
+    fun getK(k: Int): List<OffBodyData>
+
     @Insert
     fun insertAll(vararg offBodyData: OffBodyData)
 
