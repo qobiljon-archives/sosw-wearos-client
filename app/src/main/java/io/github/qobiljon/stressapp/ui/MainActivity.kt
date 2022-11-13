@@ -61,39 +61,31 @@ class MainActivity : AppCompatActivity() {
         llAuthentication = findViewById(R.id.llAuthentication)
         llDateTime = findViewById(R.id.llDateTime)
 
-        val etFullName = findViewById<EditText>(R.id.etFullName)
-        val etDateOfBirth = findViewById<EditText>(R.id.etDateOfBirth)
-        val btnAuthenticate = findViewById<Button>(R.id.btnAuthenticate)
-        btnAuthenticate.setOnClickListener {
-            btnAuthenticate.isEnabled = false
-            val fullName = etFullName.text.toString()
-            val dateOfBirth = etDateOfBirth.text.toString()
-            if (fullName.length >= 3 && Utils.validDate(dateOfBirth)) {
-                lifecycleScope.launch {
-                    val success = Api.authenticate(
-                        applicationContext,
-                        fullName = fullName,
-                        dateOfBirth = dateOfBirth,
-                    )
-                    if (success) {
-                        llAuthentication.visibility = View.GONE
-                        llDateTime.visibility = View.VISIBLE
-                        btnAuthenticate.isEnabled = true
+        val etEmail = findViewById<EditText>(R.id.etEmail)
+        val etPassword = findViewById<EditText>(R.id.etPassword)
+        val btnSignIn = findViewById<Button>(R.id.btnAuthenticate)
 
-                        Storage.setFullName(applicationContext, fullName = fullName)
-                        Storage.setDateOfBirth(applicationContext, dateOfBirth = dateOfBirth)
-                        isRunning = true
-                        runServices()
+        btnSignIn.setOnClickListener {
+            btnSignIn.isEnabled = false
+            lifecycleScope.launch {
+                val success = Api.signIn(
+                    applicationContext,
+                    email = etEmail.text.toString(),
+                    password = etPassword.text.toString(),
+                )
+                if (success) {
+                    llAuthentication.visibility = View.GONE
+                    llDateTime.visibility = View.VISIBLE
+                    btnSignIn.isEnabled = true
 
-                        Utils.toast(applicationContext, getString(R.string.auth_success))
-                    } else {
-                        btnAuthenticate.isEnabled = true
-                        Utils.toast(applicationContext, getString(R.string.auth_failure))
-                    }
+                    isRunning = true
+                    runServices()
+
+                    Utils.toast(applicationContext, getString(R.string.sign_in_success))
+                } else {
+                    btnSignIn.isEnabled = true
+                    Utils.toast(applicationContext, getString(R.string.sign_in_failure))
                 }
-            } else {
-                btnAuthenticate.isEnabled = true
-                Utils.toast(applicationContext, getString(R.string.input_failure))
             }
         }
     }

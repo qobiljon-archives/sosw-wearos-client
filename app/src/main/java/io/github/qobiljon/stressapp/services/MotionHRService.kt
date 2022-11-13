@@ -12,8 +12,6 @@ import android.os.Binder
 import android.os.IBinder
 import android.util.Log
 import io.github.qobiljon.stressapp.R
-import io.github.qobiljon.stressapp.core.data.AccData
-import io.github.qobiljon.stressapp.core.data.BVPData
 import io.github.qobiljon.stressapp.ui.MainActivity
 import io.github.qobiljon.stressapp.utils.Storage
 import java.util.*
@@ -22,9 +20,11 @@ import java.util.*
 class MotionHRService : Service(), SensorEventListener {
     companion object {
         private const val SENSOR_HR = "com.samsung.sensor.hr_raw"
-        private const val SENSOR_BVP_COLUMN = 5 // i.e. column-f
         private const val SENSOR_ACC = Sensor.STRING_TYPE_ACCELEROMETER
-        private const val SAMPLING_RATE = SensorManager.SENSOR_DELAY_GAME
+        private val SAMPLING_RATE = mapOf(
+            SENSOR_HR to SensorManager.SENSOR_DELAY_FASTEST,
+            SENSOR_ACC to SensorManager.SENSOR_DELAY_UI,
+        )
     }
 
     private lateinit var sensorManager: SensorManager
@@ -70,7 +70,7 @@ class MotionHRService : Service(), SensorEventListener {
             val allSensors = sensorManager.getSensorList(Sensor.TYPE_ALL)
             for (sensorType in listOf(SENSOR_ACC, SENSOR_HR)) {
                 val sensor = allSensors.find { s -> s.stringType.equals(sensorType) }
-                sensorManager.registerListener(this, sensor, SAMPLING_RATE)
+                sensorManager.registerListener(this, sensor, SAMPLING_RATE[sensorType]!!)
             }
             isRunning = true
         }
@@ -90,23 +90,17 @@ class MotionHRService : Service(), SensorEventListener {
 
         when (event.sensor.stringType) {
             SENSOR_ACC -> Storage.saveAccData(
-                AccData(
-                    timestamp = System.currentTimeMillis(),
-                    x = event.values[0],
-                    y = event.values[1],
-                    z = event.values[2],
-                )
+                timestamp = System.currentTimeMillis(),
+                x = event.values[0],
+                y = event.values[1],
+                z = event.values[2],
             )
-            SENSOR_HR -> Storage.saveBVPData(
-                BVPData(
-                    timestamp = System.currentTimeMillis(),
-                    light_intensity = event.values[SENSOR_BVP_COLUMN],
-                )
+            SENSOR_HR -> Storage.savePPGData(
+                timestamp = System.currentTimeMillis(),
+                lightIntensities = event.values,
             )
         }
     }
 
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        // TODO("Not yet implemented")
-    }
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 }
