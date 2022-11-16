@@ -1,8 +1,12 @@
 package io.github.qobiljon.stressapp.ui
 
+import android.annotation.SuppressLint
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.*
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -51,6 +55,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("WrongConstant")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -88,6 +93,11 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        val intentAlarm = Intent(baseContext, MainActivity::class.java)
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 60 * 1000, PendingIntent.getBroadcast(this, 1, intentAlarm, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT))
     }
 
     override fun onResume() {
