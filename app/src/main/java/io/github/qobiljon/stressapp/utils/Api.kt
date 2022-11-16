@@ -3,15 +3,15 @@ package io.github.qobiljon.stressapp.utils
 import android.content.Context
 import io.github.qobiljon.stressapp.R
 import io.github.qobiljon.stressapp.core.api.ApiInterface
-import io.github.qobiljon.stressapp.core.api.requests.AuthRequest
-import io.github.qobiljon.stressapp.core.api.requests.SubmitAccDataRequest
-import io.github.qobiljon.stressapp.core.api.requests.SubmitBVPDataRequest
-import io.github.qobiljon.stressapp.core.api.requests.SubmitOffBodyDataRequest
-import io.github.qobiljon.stressapp.core.data.AccData
-import io.github.qobiljon.stressapp.core.data.BVPData
-import io.github.qobiljon.stressapp.core.data.OffBodyData
+import io.github.qobiljon.stressapp.core.api.requests.SignInRequest
+import io.github.qobiljon.stressapp.core.api.requests.SubmitOffBodyRequest
+import io.github.qobiljon.stressapp.core.data.OffBody
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.File
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 
@@ -20,15 +20,14 @@ object Api {
         return Retrofit.Builder().addConverterFactory(GsonConverterFactory.create()).baseUrl(context.getString(R.string.api_base_url)).build().create(ApiInterface::class.java)
     }
 
-    suspend fun authenticate(context: Context, fullName: String, dateOfBirth: String): Boolean {
+    suspend fun signIn(context: Context, email: String, password: String): Boolean {
         return try {
-            val result = getApiInterface(context).authenticate(
-                AuthRequest(
-                    full_name = fullName,
-                    date_of_birth = dateOfBirth,
-                )
-            )
-            result.errorBody() == null && result.isSuccessful && result.body()?.success == true
+            val result = getApiInterface(context).signIn(SignInRequest(email = email, password = password))
+            val resultBody = result.body()
+            if (result.errorBody() == null && result.isSuccessful && resultBody != null) {
+                Storage.setAuthToken(context, authToken = resultBody.token)
+                true
+            } else false
         } catch (e: ConnectException) {
             false
         } catch (e: SocketTimeoutException) {
@@ -36,48 +35,41 @@ object Api {
         }
     }
 
-    suspend fun submitAccData(context: Context, fullName: String, dateOfBirth: String, accData: List<AccData>): Boolean {
-        return try {
-            val result = getApiInterface(context).submitAccData(
-                SubmitAccDataRequest(
-                    full_name = fullName,
-                    date_of_birth = dateOfBirth,
-                    acc_data = accData,
-                )
-            )
-            result.errorBody() == null && result.isSuccessful
-        } catch (e: ConnectException) {
-            false
-        } catch (e: SocketTimeoutException) {
-            false
-        }
-    }
-
-    suspend fun submitBVPData(context: Context, fullName: String, dateOfBirth: String, bvpData: List<BVPData>): Boolean {
-        return try {
-            val result = getApiInterface(context).submitBVPData(
-                SubmitBVPDataRequest(
-                    full_name = fullName,
-                    date_of_birth = dateOfBirth,
-                    bvp_data = bvpData,
-                )
-            )
-            result.errorBody() == null && result.isSuccessful
-        } catch (e: ConnectException) {
-            false
-        } catch (e: SocketTimeoutException) {
-            false
-        }
-    }
-
-    suspend fun submitOffBodyData(context: Context, fullName: String, dateOfBirth: String, offBodyData: List<OffBodyData>): Boolean {
+    suspend fun submitOffBody(context: Context, token: String, offBody: OffBody): Boolean {
         return try {
             val result = getApiInterface(context).submitOffBodyData(
-                SubmitOffBodyDataRequest(
-                    full_name = fullName,
-                    date_of_birth = dateOfBirth,
-                    off_body_data = offBodyData,
+                token = "Token $token", SubmitOffBodyRequest(
+                    timestamp = offBody.timestamp,
+                    is_off_body = offBody.is_off_body,
                 )
+            )
+            result.errorBody() == null && result.isSuccessful
+        } catch (e: ConnectException) {
+            false
+        } catch (e: SocketTimeoutException) {
+            false
+        }
+    }
+
+    suspend fun submitAccFile(context: Context, token: String, file: File): Boolean {
+        return try {
+            val result = getApiInterface(context).submitAccData(
+                token = "Token $token",
+                file = MultipartBody.Part.createFormData("file", file.name, RequestBody.create(MediaType.parse("text/plain"), file)),
+            )
+            result.errorBody() == null && result.isSuccessful
+        } catch (e: ConnectException) {
+            false
+        } catch (e: SocketTimeoutException) {
+            false
+        }
+    }
+
+    suspend fun submitPPGFile(context: Context, token: String, file: File): Boolean {
+        return try {
+            val result = getApiInterface(context).submitPPGData(
+                token = "Token $token",
+                file = MultipartBody.Part.createFormData("file", file.name, RequestBody.create(MediaType.parse("text/plain"), file)),
             )
             result.errorBody() == null && result.isSuccessful
         } catch (e: ConnectException) {

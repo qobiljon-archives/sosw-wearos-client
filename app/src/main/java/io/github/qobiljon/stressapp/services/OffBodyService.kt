@@ -13,7 +13,7 @@ import android.os.IBinder
 import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.github.qobiljon.stressapp.R
-import io.github.qobiljon.stressapp.core.data.OffBodyData
+import io.github.qobiljon.stressapp.core.data.OffBody
 import io.github.qobiljon.stressapp.ui.MainActivity
 import io.github.qobiljon.stressapp.utils.Storage
 import java.util.*
@@ -77,7 +77,7 @@ class OffBodyService : Service(), SensorEventListener {
         val isOffBody = event.values[0] != 1.0f
 
         Storage.saveOffBodyData(
-            OffBodyData(
+            OffBody(
                 timestamp = System.currentTimeMillis(),
                 is_off_body = isOffBody,
             )

@@ -1,3 +1,5 @@
 package io.github.qobiljon.stressapp.core.api.responses
 
-class EmptyResponse
+data class SignInResponse(
+    val token: String,
+)

@@ -7,15 +7,15 @@ import androidx.room.Query
 
 @Dao
 interface OffBodyDataDao {
-    @Query("SELECT * FROM offbodydata;")
-    fun getAll(): List<OffBodyData>
+    @Query("SELECT * FROM offbody;")
+    fun getAll(): List<OffBody>
 
-    @Query("SELECT * FROM offbodydata ORDER BY timestamp ASC LIMIT :k")
-    fun getK(k: Int): List<OffBodyData>
+    @Query("SELECT * FROM offbody ORDER BY timestamp ASC LIMIT :k")
+    fun getK(k: Int): List<OffBody>
 
     @Insert
-    fun insertAll(vararg offBodyData: OffBodyData)
+    fun insertAll(vararg offBodyData: OffBody)
 
     @Delete
-    fun delete(offBodyData: OffBodyData)
+    fun delete(offBodyData: OffBody)
 }

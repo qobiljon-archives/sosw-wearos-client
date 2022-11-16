@@ -6,9 +6,7 @@ import androidx.room.PrimaryKey
 
 
 @Entity
-data class AccData(
+data class OffBody(
     @PrimaryKey val timestamp: Long,
-    @ColumnInfo(name = "x") val x: Float,
-    @ColumnInfo(name = "y") val y: Float,
-    @ColumnInfo(name = "z") val z: Float,
+    @ColumnInfo(name = "is_off_body") val is_off_body: Boolean,
 )
