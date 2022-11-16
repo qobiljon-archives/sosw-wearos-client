@@ -39,32 +39,22 @@ object Storage {
         if (!isAuthenticated(context)) return
 
         runBlocking {
-            val accFiles = getAccFiles(context)
-            if (accFiles.isNotEmpty()) launch {
-                Api.submitAccData(
-                    context,
-                    token = getAuthToken(context),
-                    files = accFiles,
-                )
+            launch {
+                getAccFiles(context).forEach {
+                    val success = Api.submitAccFile(context, token = getAuthToken(context), file = it)
+                    if (success) it.delete()
+                }
             }
-
-            val ppgFiles = getPPGFiles(context)
-            if (ppgFiles.isNotEmpty()) launch {
-                Api.submitPPGData(
-                    context,
-                    token = getAuthToken(context),
-                    files = ppgFiles,
-                )
+            launch {
+                getPPGFiles(context).forEach {
+                    val success = Api.submitPPGFile(context, token = getAuthToken(context), file = it)
+                    if (success) it.delete()
+                }
             }
-
             val offBodyDao = db.offBodyDataDao()
             launch {
                 for (offBody in offBodyDao.getAll()) {
-                    val success = Api.submitOffBody(
-                        context,
-                        token = getAuthToken(context),
-                        offBody = offBody,
-                    )
+                    val success = Api.submitOffBody(context, token = getAuthToken(context), offBody = offBody)
                     if (success) offBodyDao.delete(offBody)
                 }
             }
@@ -97,41 +87,44 @@ object Storage {
         ppgFile?.appendText("$timestamp,${lightIntensities.joinToString(separator = ",")}\n")
     }
 
+    private fun getFiles(context: Context, search: String, ignore: String): List<File> {
+        val ans = mutableListOf<File>()
+        for (file in context.filesDir.listFiles { file -> file.name.contains(search) }?.toList() ?: listOf()) {
+            if (file.name.equals(ignore)) continue
+            else if (file.length() == 0L) file.delete()
+            else ans.add(file)
+        }
+        ans.sortBy { it.name }
+        return ans
+    }
+
     private fun getAccFiles(context: Context): List<File> {
-        // copy current file
-        accFile?.copyTo(File(context.filesDir, "acc${System.currentTimeMillis()}.csv"))
+        val ans = getFiles(context, search = "acc", ignore = ACC_FILENAME)
+        if (ans.isNotEmpty()) return ans
+
+        // prepare current file for submission
+        val newFile = File(context.filesDir, "acc${System.currentTimeMillis()}.csv")
+        accFile?.copyTo(newFile)
         accFile?.let {
             val w = PrintWriter(it)
             w.print("")
             w.close()
         }
-
-        // gather all acc files
-        val ans = mutableListOf<File>()
-        for (file in context.filesDir.listFiles { file -> file.name.contains("acc") }?.toList() ?: listOf()) {
-            if (file.name.equals(ACC_FILENAME)) continue
-            else if (file.length() == 0L) file.delete()
-            else ans.add(file)
-        }
-        return ans
+        return listOf(newFile)
     }
 
     private fun getPPGFiles(context: Context): List<File> {
-        // copy current file
-        ppgFile?.copyTo(File(context.filesDir, "ppg${System.currentTimeMillis()}.csv"))
+        val ans = getFiles(context, search = "ppg", ignore = PPG_FILENAME)
+        if (ans.isNotEmpty()) return ans
+
+        // prepare current file for submission
+        val newFile = File(context.filesDir, "ppg${System.currentTimeMillis()}.csv")
+        ppgFile?.copyTo(newFile)
         ppgFile?.let {
             val w = PrintWriter(it)
             w.print("")
             w.close()
         }
-
-        // gather all ppg files
-        val ans = mutableListOf<File>()
-        for (file in context.filesDir.listFiles { file -> file.name.contains("ppg") }?.toList() ?: listOf()) {
-            if (file.name.equals(PPG_FILENAME)) continue
-            else if (file.length() == 0L) file.delete()
-            else ans.add(file)
-        }
-        return ans
+        return listOf(newFile)
     }
 }

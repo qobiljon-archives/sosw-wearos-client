@@ -4,14 +4,13 @@ import android.content.Context
 import io.github.qobiljon.stressapp.R
 import io.github.qobiljon.stressapp.core.api.ApiInterface
 import io.github.qobiljon.stressapp.core.api.requests.SignInRequest
-import io.github.qobiljon.stressapp.core.api.requests.SubmitAccRequest
 import io.github.qobiljon.stressapp.core.api.requests.SubmitOffBodyRequest
-import io.github.qobiljon.stressapp.core.api.requests.SubmitPPGRequest
 import io.github.qobiljon.stressapp.core.data.OffBody
+import okhttp3.MediaType
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.Headers
 import java.io.File
 import java.net.ConnectException
 import java.net.SocketTimeoutException
@@ -52,11 +51,11 @@ object Api {
         }
     }
 
-    suspend fun submitAccData(context: Context, token: String, files: List<File>): Boolean {
+    suspend fun submitAccFile(context: Context, token: String, file: File): Boolean {
         return try {
             val result = getApiInterface(context).submitAccData(
                 token = "Token $token",
-                submitAccRequest = SubmitAccRequest(files = files),
+                file = MultipartBody.Part.createFormData("file", file.name, RequestBody.create(MediaType.parse("text/plain"), file)),
             )
             result.errorBody() == null && result.isSuccessful
         } catch (e: ConnectException) {
@@ -66,15 +65,12 @@ object Api {
         }
     }
 
-    suspend fun submitPPGData(context: Context, token: String, files: List<File>): Boolean {
+    suspend fun submitPPGFile(context: Context, token: String, file: File): Boolean {
         return try {
             val result = getApiInterface(context).submitPPGData(
                 token = "Token $token",
-                submitPPGRequest = MultipartBody.Part.create(
-                    headers = Headers()
-                ),
+                file = MultipartBody.Part.createFormData("file", file.name, RequestBody.create(MediaType.parse("text/plain"), file)),
             )
-
             result.errorBody() == null && result.isSuccessful
         } catch (e: ConnectException) {
             false
