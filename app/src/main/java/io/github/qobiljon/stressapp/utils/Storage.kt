@@ -17,6 +17,8 @@ object Storage {
     private const val KEY_AUTH_TOKEN = "auth_token"
     private const val ACC_FILENAME = "acc.csv"
     private const val PPG_FILENAME = "ppg.csv"
+    private const val ACC_MIN_SUBMISSION_SIZE = 100 * 1024 // at least 100 KB
+    private const val PPG_MIN_SUBMISSION_SIZE = 1024 * 1024 // at least 1 MB
     private var accFile: File? = null
     private var ppgFile: File? = null
 
@@ -104,13 +106,15 @@ object Storage {
 
         // prepare current file for submission
         val newFile = File(context.filesDir, "acc${System.currentTimeMillis()}.csv")
-        accFile?.copyTo(newFile)
         accFile?.let {
+            // check if current file has "enough" amount of data
+            if (it.length() < ACC_MIN_SUBMISSION_SIZE) return@let
+            it.copyTo(newFile)
             val w = PrintWriter(it)
             w.print("")
             w.close()
         }
-        return listOf(newFile)
+        return if (newFile.exists()) listOf(newFile) else listOf()
     }
 
     private fun getPPGFiles(context: Context): List<File> {
@@ -119,12 +123,14 @@ object Storage {
 
         // prepare current file for submission
         val newFile = File(context.filesDir, "ppg${System.currentTimeMillis()}.csv")
-        ppgFile?.copyTo(newFile)
         ppgFile?.let {
+            // check if current file has "enough" amount of data
+            if (it.length() < PPG_MIN_SUBMISSION_SIZE) return@let
+            it.copyTo(newFile)
             val w = PrintWriter(it)
             w.print("")
             w.close()
         }
-        return listOf(newFile)
+        return if (newFile.exists()) listOf(newFile) else listOf()
     }
 }
