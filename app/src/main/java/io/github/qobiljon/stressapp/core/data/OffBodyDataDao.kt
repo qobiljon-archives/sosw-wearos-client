@@ -13,6 +13,9 @@ interface OffBodyDataDao {
     @Query("SELECT * FROM offbody ORDER BY timestamp ASC LIMIT :k")
     fun getK(k: Int): List<OffBody>
 
+    @Query("SELECT is_off_body FROM offbody ORDER BY timestamp DESC LIMIT 1")
+    fun getLatestState(): Boolean?
+    
     @Insert
     fun insertAll(vararg offBodyData: OffBody)
 

@@ -1,8 +1,12 @@
 package io.github.qobiljon.stressapp.ui
 
+import android.annotation.SuppressLint
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.*
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -11,7 +15,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.room.Room
 import io.github.qobiljon.stressapp.R
+import io.github.qobiljon.stressapp.core.data.AppDatabase
 import io.github.qobiljon.stressapp.databinding.ActivityMainBinding
 import io.github.qobiljon.stressapp.services.DataSubmissionService
 import io.github.qobiljon.stressapp.services.OffBodyService
@@ -51,6 +57,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("WrongConstant")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -88,6 +95,23 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        val db = Room.databaseBuilder(applicationContext, AppDatabase::class.java, getString(R.string.room_db_name)).allowMainThreadQueries().build()
+        val dao = db.offBodyDataDao()
+        val isOffBody = dao.getLatestState() ?: false
+        val tvOffBody = findViewById<TextView>(R.id.tvOffBody)
+        if (isOffBody) {
+            tvOffBody.text = getString(R.string.off_body)
+            binding.root.background = AppCompatResources.getDrawable(applicationContext, R.drawable.orange_circle)
+        } else {
+            tvOffBody.text = getString(R.string.on_body)
+            binding.root.background = AppCompatResources.getDrawable(applicationContext, R.drawable.green_circle)
+        }
+
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        val intentAlarm = Intent(baseContext, MainActivity::class.java)
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 60 * 1000, PendingIntent.getBroadcast(this, 1, intentAlarm, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT))
     }
 
     override fun onResume() {
