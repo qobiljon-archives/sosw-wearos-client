@@ -15,7 +15,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.room.Room
 import io.github.qobiljon.stressapp.R
+import io.github.qobiljon.stressapp.core.data.AppDatabase
 import io.github.qobiljon.stressapp.databinding.ActivityMainBinding
 import io.github.qobiljon.stressapp.services.DataSubmissionService
 import io.github.qobiljon.stressapp.services.OffBodyService
@@ -92,6 +94,18 @@ class MainActivity : AppCompatActivity() {
                     Utils.toast(applicationContext, getString(R.string.sign_in_failure))
                 }
             }
+        }
+
+        val db = Room.databaseBuilder(applicationContext, AppDatabase::class.java, getString(R.string.room_db_name)).allowMainThreadQueries().build()
+        val dao = db.offBodyDataDao()
+        val isOffBody = dao.getLatestState() ?: false
+        val tvOffBody = findViewById<TextView>(R.id.tvOffBody)
+        if (isOffBody) {
+            tvOffBody.text = getString(R.string.off_body)
+            binding.root.background = AppCompatResources.getDrawable(applicationContext, R.drawable.orange_circle)
+        } else {
+            tvOffBody.text = getString(R.string.on_body)
+            binding.root.background = AppCompatResources.getDrawable(applicationContext, R.drawable.green_circle)
         }
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)

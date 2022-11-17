@@ -41,18 +41,8 @@ object Storage {
         if (!isAuthenticated(context)) return
 
         runBlocking {
-            launch {
-                getAccFiles(context).forEach {
-                    val success = Api.submitAccFile(context, token = getAuthToken(context), file = it)
-                    if (success) it.delete()
-                }
-            }
-            launch {
-                getPPGFiles(context).forEach {
-                    val success = Api.submitPPGFile(context, token = getAuthToken(context), file = it)
-                    if (success) it.delete()
-                }
-            }
+            launch { getAccFiles(context).forEach { if (Api.submitAccFile(context, token = getAuthToken(context), file = it)) it.delete() } }
+            launch { getPPGFiles(context).forEach { if (Api.submitPPGFile(context, token = getAuthToken(context), file = it)) it.delete() } }
             val offBodyDao = db.offBodyDataDao()
             launch {
                 for (offBody in offBodyDao.getAll()) {

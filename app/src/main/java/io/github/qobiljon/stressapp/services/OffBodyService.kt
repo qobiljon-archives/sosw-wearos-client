@@ -23,6 +23,7 @@ class OffBodyService : Service(), SensorEventListener {
     companion object {
         private const val SENSOR_OFF_BODY = "com.samsung.sensor.low_power_offbody_detector"
         private const val SAMPLING_RATE = SensorManager.SENSOR_DELAY_NORMAL
+        var isOffBody = false
     }
 
     private lateinit var sensorManager: SensorManager
@@ -74,7 +75,7 @@ class OffBodyService : Service(), SensorEventListener {
     }
 
     override fun onSensorChanged(event: SensorEvent) {
-        val isOffBody = event.values[0] != 1.0f
+        isOffBody = event.values[0] != 1.0f
 
         Storage.saveOffBodyData(
             OffBody(
