@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace 'io.github.qobiljon.stressapp'
+    namespace 'io.github.qobiljon.stress'
     compileSdk 33
 
     defaultConfig {

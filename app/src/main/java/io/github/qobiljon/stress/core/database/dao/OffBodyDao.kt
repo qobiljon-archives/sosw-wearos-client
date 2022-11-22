@@ -1,12 +1,13 @@
-package io.github.qobiljon.stressapp.core.data
+package io.github.qobiljon.stress.core.database.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import io.github.qobiljon.stress.core.database.data.OffBody
 
 @Dao
-interface OffBodyDataDao {
+interface OffBodyDao {
     @Query("SELECT * FROM offbody;")
     fun getAll(): List<OffBody>
 

@@ -1,4 +1,4 @@
-package io.github.qobiljon.stressapp.core.data
+package io.github.qobiljon.stress.core.database.data
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

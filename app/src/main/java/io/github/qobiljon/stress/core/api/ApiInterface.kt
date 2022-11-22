@@ -1,7 +1,7 @@
-package io.github.qobiljon.stressapp.core.api
+package io.github.qobiljon.stress.core.api
 
-import io.github.qobiljon.stressapp.core.api.requests.*
-import io.github.qobiljon.stressapp.core.api.responses.*
+import io.github.qobiljon.stress.core.api.requests.*
+import io.github.qobiljon.stress.core.api.responses.*
 import retrofit2.Response
 import retrofit2.http.*
 

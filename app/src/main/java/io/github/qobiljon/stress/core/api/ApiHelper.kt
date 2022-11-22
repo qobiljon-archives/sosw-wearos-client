@@ -1,12 +1,12 @@
-package io.github.qobiljon.stressapp.utils
+package io.github.qobiljon.stress.core.api
 
 import android.content.Context
 import com.koushikdutta.ion.Ion
-import io.github.qobiljon.stressapp.R
-import io.github.qobiljon.stressapp.core.api.ApiInterface
-import io.github.qobiljon.stressapp.core.api.requests.SignInRequest
-import io.github.qobiljon.stressapp.core.api.requests.SubmitOffBodyRequest
-import io.github.qobiljon.stressapp.core.data.OffBody
+import io.github.qobiljon.stress.R
+import io.github.qobiljon.stress.core.api.requests.SignInRequest
+import io.github.qobiljon.stress.core.api.requests.SubmitOffBodyRequest
+import io.github.qobiljon.stress.core.database.data.OffBody
+import io.github.qobiljon.stress.core.database.DatabaseHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
@@ -16,7 +16,7 @@ import java.net.ConnectException
 import java.net.SocketTimeoutException
 
 
-object Api {
+object ApiHelper {
     private var apiInterface: ApiInterface? = null
 
     private fun getApiInterface(context: Context): ApiInterface {
@@ -29,7 +29,7 @@ object Api {
             val result = getApiInterface(context).signIn(SignInRequest(email = email, password = password))
             val resultBody = result.body()
             if (result.errorBody() == null && result.isSuccessful && resultBody != null) {
-                Storage.setAuthToken(context, authToken = resultBody.token)
+                DatabaseHelper.setAuthToken(context, authToken = resultBody.token)
                 true
             } else false
         } catch (e: ConnectException) {
