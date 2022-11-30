@@ -18,6 +18,9 @@ object DatabaseHelper {
     private const val KEY_AUTH_TOKEN = "auth_token"
 
     private lateinit var db: AppDatabase
+    private var accUploading = false
+    private var ppgUploading = false
+    private var offBodyUploading = false
 
     private fun getSharedPreferences(context: Context): SharedPreferences {
         return context.getSharedPreferences(KEY_PREFS_NAME, Context.MODE_PRIVATE)
@@ -26,72 +29,84 @@ object DatabaseHelper {
     fun init(context: Context) {
         db = Room.databaseBuilder(context, AppDatabase::class.java, context.getString(R.string.room_db_name)).allowMainThreadQueries().build()
     }
-
+    
     fun syncToCloud(context: Context) {
         if (!isAuthenticated(context)) return
 
         runBlocking {
-            launch {
-                val dao = db.accDao()
-                val lastTimestamp = dao.getLastTimestamp()
-                val exportFile = File(context.filesDir, "acc.csv")
+            if (!accUploading) {
+                accUploading = true
+                launch {
+                    val dao = db.accDao()
+                    val lastTimestamp = dao.getLastTimestamp()
+                    val exportFile = File(context.filesDir, "acc.csv")
 
-                var canSubmit = false
-                if (exportFile.exists() && exportFile.length() == 0L) exportFile.delete()
-                if (lastTimestamp != -1L) {
-                    if (!exportFile.exists()) exportFile.createNewFile()
-                    canSubmit = true
-                }
-                if (canSubmit) {
-                    dao.exportCSVRows(lastTimestamp).forEach { line -> exportFile.appendText(line) }
-                    dao.clearItems(lastTimestamp)
-                    val success = ApiHelper.submitAccFile(
-                        context = context,
-                        token = getAuthToken(context),
-                        file = exportFile,
-                    )
-                    if (success) {
-                        exportFile.delete()
-                        dao.clearItems(lastTimestamp)
+                    var canSubmit = false
+                    if (exportFile.exists() && exportFile.length() == 0L) exportFile.delete()
+                    if (lastTimestamp != -1L) {
+                        if (!exportFile.exists()) exportFile.createNewFile()
+                        canSubmit = true
                     }
+                    if (canSubmit) {
+                        dao.exportCSVRows(lastTimestamp).forEach { line -> exportFile.appendText(line) }
+                        dao.clearItems(lastTimestamp)
+                        val success = ApiHelper.submitAccFile(
+                            context = context,
+                            token = getAuthToken(context),
+                            file = exportFile,
+                        )
+                        if (success) {
+                            exportFile.delete()
+                            dao.clearItems(lastTimestamp)
+                        }
+                    }
+                    accUploading = false
                 }
             }
 
-            launch {
-                val dao = db.ppgDao()
-                val lastTimestamp = dao.getLastTimestamp()
-                val exportFile = File(context.filesDir, "ppg.csv")
+            if (!ppgUploading) {
+                ppgUploading = true
+                launch {
+                    val dao = db.ppgDao()
+                    val lastTimestamp = dao.getLastTimestamp()
+                    val exportFile = File(context.filesDir, "ppg.csv")
 
-                var canSubmit = false
-                if (exportFile.exists() && exportFile.length() == 0L) exportFile.delete()
-                if (lastTimestamp != -1L) {
-                    if (!exportFile.exists()) exportFile.createNewFile()
-                    canSubmit = true
-                }
-                if (canSubmit) {
-                    dao.exportCSVRows(lastTimestamp).forEach { line -> exportFile.appendText(line) }
-                    dao.clearItems(lastTimestamp)
-                    val success = ApiHelper.submitPPGFile(
-                        context = context,
-                        token = getAuthToken(context),
-                        file = exportFile,
-                    )
-                    if (success) {
-                        exportFile.delete()
-                        dao.clearItems(lastTimestamp)
+                    var canSubmit = false
+                    if (exportFile.exists() && exportFile.length() == 0L) exportFile.delete()
+                    if (lastTimestamp != -1L) {
+                        if (!exportFile.exists()) exportFile.createNewFile()
+                        canSubmit = true
                     }
+                    if (canSubmit) {
+                        dao.exportCSVRows(lastTimestamp).forEach { line -> exportFile.appendText(line) }
+                        dao.clearItems(lastTimestamp)
+                        val success = ApiHelper.submitPPGFile(
+                            context = context,
+                            token = getAuthToken(context),
+                            file = exportFile,
+                        )
+                        if (success) {
+                            exportFile.delete()
+                            dao.clearItems(lastTimestamp)
+                        }
+                    }
+                    ppgUploading = false
                 }
             }
 
-            launch {
-                val dao = db.offBodyDao()
-                for (offBody in dao.getAll()) {
-                    val success = ApiHelper.submitOffBody(
-                        context = context,
-                        token = getAuthToken(context),
-                        offBody = offBody,
-                    )
-                    if (success) dao.delete(offBody)
+            if (!offBodyUploading) {
+                offBodyUploading = true
+                launch {
+                    val dao = db.offBodyDao()
+                    for (offBody in dao.getAll()) {
+                        val success = ApiHelper.submitOffBody(
+                            context = context,
+                            token = getAuthToken(context),
+                            offBody = offBody,
+                        )
+                        if (success) dao.delete(offBody)
+                    }
+                    offBodyUploading = false
                 }
             }
         }
