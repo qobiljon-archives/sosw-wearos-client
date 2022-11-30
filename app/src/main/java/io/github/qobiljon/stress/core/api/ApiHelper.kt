@@ -1,14 +1,14 @@
 package io.github.qobiljon.stress.core.api
 
 import android.content.Context
-import com.koushikdutta.ion.Ion
 import io.github.qobiljon.stress.R
 import io.github.qobiljon.stress.core.api.requests.SignInRequest
 import io.github.qobiljon.stress.core.api.requests.SubmitOffBodyRequest
-import io.github.qobiljon.stress.core.database.data.OffBody
 import io.github.qobiljon.stress.core.database.DatabaseHelper
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import io.github.qobiljon.stress.core.database.data.OffBody
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
@@ -56,12 +56,38 @@ object ApiHelper {
     }
 
     suspend fun submitAccFile(context: Context, token: String, file: File): Boolean {
-        val res = withContext(Dispatchers.IO) { Ion.with(context).load("${context.getString(R.string.api_base_url)}submit_acc").addHeader("Authorization", "Token $token").setMultipartFile("file", "text/plain", file).asString().get() }
-        return res.isEmpty()
+        return try {
+            val requestBody = RequestBody.create(MediaType.parse("text/plain"), file)
+            val formData = MultipartBody.Part.createFormData("file", file.name, requestBody)
+            val filename = RequestBody.create(MediaType.parse("text/plain"), file.name)
+            val result = getApiInterface(context).submitAccFile(
+                token = "Token $token",
+                file = formData,
+                name = filename,
+            )
+            result.errorBody() == null && result.isSuccessful
+        } catch (e: ConnectException) {
+            false
+        } catch (e: SocketTimeoutException) {
+            false
+        }
     }
 
     suspend fun submitPPGFile(context: Context, token: String, file: File): Boolean {
-        val res = withContext(Dispatchers.IO) { Ion.with(context).load("${context.getString(R.string.api_base_url)}submit_ppg").addHeader("Authorization", "Token $token").setMultipartFile("file", "text/plain", file).asString().get() }
-        return res.isEmpty()
+        return try {
+            val requestBody = RequestBody.create(MediaType.parse("text/plain"), file)
+            val formData = MultipartBody.Part.createFormData("file", file.name, requestBody)
+            val filename = RequestBody.create(MediaType.parse("text/plain"), file.name)
+            val result = getApiInterface(context).submitPPGFile(
+                token = "Token $token",
+                file = formData,
+                name = filename,
+            )
+            result.errorBody() == null && result.isSuccessful
+        } catch (e: ConnectException) {
+            false
+        } catch (e: SocketTimeoutException) {
+            false
+        }
     }
 }

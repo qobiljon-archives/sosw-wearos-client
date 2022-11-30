@@ -8,15 +8,9 @@ import io.github.qobiljon.stress.core.database.data.OffBody
 
 @Dao
 interface OffBodyDao {
-    @Query("SELECT * FROM offbody;")
+    @Query("SELECT * FROM offbody ORDER BY timestamp DESC")
     fun getAll(): List<OffBody>
 
-    @Query("SELECT * FROM offbody ORDER BY timestamp ASC LIMIT :k")
-    fun getK(k: Int): List<OffBody>
-
-    @Query("SELECT is_off_body FROM offbody ORDER BY timestamp DESC LIMIT 1")
-    fun getLatestState(): Boolean?
-    
     @Insert
     fun insertAll(vararg offBodyData: OffBody)
 

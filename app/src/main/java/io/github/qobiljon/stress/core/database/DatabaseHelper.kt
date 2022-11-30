@@ -7,9 +7,11 @@ import androidx.room.Room
 import io.github.qobiljon.etagent.database.data.Acc
 import io.github.qobiljon.etagent.database.data.PPG
 import io.github.qobiljon.stress.R
+import io.github.qobiljon.stress.core.api.ApiHelper
 import io.github.qobiljon.stress.core.database.data.OffBody
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.io.File
 
 object DatabaseHelper {
     private const val KEY_PREFS_NAME = "shared_prefs"
@@ -30,7 +32,67 @@ object DatabaseHelper {
 
         runBlocking {
             launch {
-                TODO("Not implemented yet")
+                val dao = db.accDao()
+                val lastTimestamp = dao.getLastTimestamp()
+                val exportFile = File(context.filesDir, "acc.csv")
+
+                var canSubmit = false
+                if (exportFile.exists() && exportFile.length() == 0L) exportFile.delete()
+                if (lastTimestamp != -1L) {
+                    if (!exportFile.exists()) exportFile.createNewFile()
+                    canSubmit = true
+                }
+                if (canSubmit) {
+                    dao.exportCSVRows(lastTimestamp).forEach { line -> exportFile.appendText(line) }
+                    dao.clearItems(lastTimestamp)
+                    val success = ApiHelper.submitAccFile(
+                        context = context,
+                        token = getAuthToken(context),
+                        file = exportFile,
+                    )
+                    if (success) {
+                        exportFile.delete()
+                        dao.clearItems(lastTimestamp)
+                    }
+                }
+            }
+
+            launch {
+                val dao = db.ppgDao()
+                val lastTimestamp = dao.getLastTimestamp()
+                val exportFile = File(context.filesDir, "ppg.csv")
+
+                var canSubmit = false
+                if (exportFile.exists() && exportFile.length() == 0L) exportFile.delete()
+                if (lastTimestamp != -1L) {
+                    if (!exportFile.exists()) exportFile.createNewFile()
+                    canSubmit = true
+                }
+                if (canSubmit) {
+                    dao.exportCSVRows(lastTimestamp).forEach { line -> exportFile.appendText(line) }
+                    dao.clearItems(lastTimestamp)
+                    val success = ApiHelper.submitPPGFile(
+                        context = context,
+                        token = getAuthToken(context),
+                        file = exportFile,
+                    )
+                    if (success) {
+                        exportFile.delete()
+                        dao.clearItems(lastTimestamp)
+                    }
+                }
+            }
+
+            launch {
+                val dao = db.offBodyDao()
+                for (offBody in dao.getAll()) {
+                    val success = ApiHelper.submitOffBody(
+                        context = context,
+                        token = getAuthToken(context),
+                        offBody = offBody,
+                    )
+                    if (success) dao.delete(offBody)
+                }
             }
         }
     }

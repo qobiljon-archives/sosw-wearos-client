@@ -4,7 +4,7 @@ import android.app.Application
 import io.github.qobiljon.stress.core.database.DatabaseHelper
 
 
-class AndroidApplication : Application() {
+class WearOSApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
