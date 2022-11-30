@@ -1,4 +1,4 @@
-package io.github.qobiljon.stressapp.utils
+package io.github.qobiljon.stress.utils
 
 import android.content.Context
 import android.widget.Toast

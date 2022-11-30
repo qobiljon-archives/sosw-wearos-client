@@ -1,40 +1,31 @@
-package io.github.qobiljon.stressapp.services
+package io.github.qobiljon.stress.sensors.services
 
 import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.hardware.Sensor
-import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
-import io.github.qobiljon.stressapp.R
-import io.github.qobiljon.stressapp.ui.MainActivity
-import io.github.qobiljon.stressapp.utils.Storage
+import io.github.qobiljon.stress.R
+import io.github.qobiljon.stress.sensors.AppSensors
+import io.github.qobiljon.stress.sensors.listeners.*
+import io.github.qobiljon.stress.ui.MainActivity
 import java.util.*
 
 
-class MotionHRService : Service(), SensorEventListener {
-    companion object {
-        private const val SENSOR_HR = "com.samsung.sensor.hr_raw"
-        private const val SENSOR_ACC = Sensor.STRING_TYPE_ACCELEROMETER
-        private val SAMPLING_RATE = mapOf(
-            SENSOR_HR to SensorManager.SENSOR_DELAY_FASTEST,
-            SENSOR_ACC to SensorManager.SENSOR_DELAY_UI,
-        )
-    }
-
-    private lateinit var sensorManager: SensorManager
-    private var isRunning = false
+class DataCollectionService : Service() {
     private val mBinder: IBinder = LocalBinder()
+    private val listeners = mutableListOf<SensorEventListener>()
+    var isRunning = false
 
     inner class LocalBinder : Binder() {
         @Suppress("unused")
-        val getService: MotionHRService
-            get() = this@MotionHRService
+        val getService: DataCollectionService
+            get() = this@DataCollectionService
     }
 
     override fun onBind(intent: Intent): IBinder {
@@ -43,8 +34,6 @@ class MotionHRService : Service(), SensorEventListener {
 
     override fun onCreate() {
         Log.e(MainActivity.TAG, "MotionHRService.onCreate()")
-
-        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
         // foreground svc
         val notificationId = 98764
@@ -66,41 +55,32 @@ class MotionHRService : Service(), SensorEventListener {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         Log.e(MainActivity.TAG, "MotionHRService.onStartCommand()")
         if (isRunning) return START_STICKY
-        else {
-            val allSensors = sensorManager.getSensorList(Sensor.TYPE_ALL)
-            for (sensorType in listOf(SENSOR_ACC, SENSOR_HR)) {
-                val sensor = allSensors.find { s -> s.stringType.equals(sensorType) }
-                sensorManager.registerListener(this, sensor, SAMPLING_RATE[sensorType]!!)
-            }
-            isRunning = true
-        }
+        else isRunning = true
 
+        val sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        val sensors = sensorManager.getSensorList(Sensor.TYPE_ALL)
+
+        mapOf(
+            AppSensors.SENSOR_PPG to PPGListener(),
+            AppSensors.SENSOR_ACC to AccListener(),
+            AppSensors.SENSOR_OFF_BODY to OffBodyListener(applicationContext),
+        ).forEach { (appSensor, listener) ->
+            sensors.find { s -> s.stringType.equals(appSensor.type) }?.let { sensor ->
+                sensorManager.registerListener(listener, sensor, appSensor.sensingRate())
+                listeners.add(listener)
+            }
+        }
         return START_STICKY
     }
 
     override fun onDestroy() {
         Log.e(MainActivity.TAG, "MotionHRService.onDestroy()")
-        sensorManager.unregisterListener(this)
+
+        val sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        listeners.forEach { sensorManager.unregisterListener(it) }
+        listeners.clear()
         isRunning = false
+
         super.onDestroy()
     }
-
-    override fun onSensorChanged(event: SensorEvent) {
-        if (event.values.isEmpty()) return
-
-        when (event.sensor.stringType) {
-            SENSOR_ACC -> Storage.saveAccData(
-                timestamp = System.currentTimeMillis(),
-                x = event.values[0],
-                y = event.values[1],
-                z = event.values[2],
-            )
-            SENSOR_HR -> Storage.savePPGData(
-                timestamp = System.currentTimeMillis(),
-                lightIntensities = event.values,
-            )
-        }
-    }
-
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 }

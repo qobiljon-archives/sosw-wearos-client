@@ -1,14 +1,14 @@
-package io.github.qobiljon.stressapp.utils
+package io.github.qobiljon.stress.core.api
 
 import android.content.Context
-import com.koushikdutta.ion.Ion
-import io.github.qobiljon.stressapp.R
-import io.github.qobiljon.stressapp.core.api.ApiInterface
-import io.github.qobiljon.stressapp.core.api.requests.SignInRequest
-import io.github.qobiljon.stressapp.core.api.requests.SubmitOffBodyRequest
-import io.github.qobiljon.stressapp.core.data.OffBody
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import io.github.qobiljon.stress.R
+import io.github.qobiljon.stress.core.api.requests.SignInRequest
+import io.github.qobiljon.stress.core.api.requests.SubmitOffBodyRequest
+import io.github.qobiljon.stress.core.database.DatabaseHelper
+import io.github.qobiljon.stress.core.database.data.OffBody
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
@@ -16,7 +16,7 @@ import java.net.ConnectException
 import java.net.SocketTimeoutException
 
 
-object Api {
+object ApiHelper {
     private var apiInterface: ApiInterface? = null
 
     private fun getApiInterface(context: Context): ApiInterface {
@@ -29,7 +29,7 @@ object Api {
             val result = getApiInterface(context).signIn(SignInRequest(email = email, password = password))
             val resultBody = result.body()
             if (result.errorBody() == null && result.isSuccessful && resultBody != null) {
-                Storage.setAuthToken(context, authToken = resultBody.token)
+                DatabaseHelper.setAuthToken(context, authToken = resultBody.token)
                 true
             } else false
         } catch (e: ConnectException) {
@@ -56,12 +56,38 @@ object Api {
     }
 
     suspend fun submitAccFile(context: Context, token: String, file: File): Boolean {
-        val res = withContext(Dispatchers.IO) { Ion.with(context).load("${context.getString(R.string.api_base_url)}submit_acc").addHeader("Authorization", "Token $token").setMultipartFile("file", "text/plain", file).asString().get() }
-        return res.isEmpty()
+        return try {
+            val requestBody = RequestBody.create(MediaType.parse("text/plain"), file)
+            val formData = MultipartBody.Part.createFormData("file", file.name, requestBody)
+            val filename = RequestBody.create(MediaType.parse("text/plain"), file.name)
+            val result = getApiInterface(context).submitAccFile(
+                token = "Token $token",
+                file = formData,
+                name = filename,
+            )
+            result.errorBody() == null && result.isSuccessful
+        } catch (e: ConnectException) {
+            false
+        } catch (e: SocketTimeoutException) {
+            false
+        }
     }
 
     suspend fun submitPPGFile(context: Context, token: String, file: File): Boolean {
-        val res = withContext(Dispatchers.IO) { Ion.with(context).load("${context.getString(R.string.api_base_url)}submit_ppg").addHeader("Authorization", "Token $token").setMultipartFile("file", "text/plain", file).asString().get() }
-        return res.isEmpty()
+        return try {
+            val requestBody = RequestBody.create(MediaType.parse("text/plain"), file)
+            val formData = MultipartBody.Part.createFormData("file", file.name, requestBody)
+            val filename = RequestBody.create(MediaType.parse("text/plain"), file.name)
+            val result = getApiInterface(context).submitPPGFile(
+                token = "Token $token",
+                file = formData,
+                name = filename,
+            )
+            result.errorBody() == null && result.isSuccessful
+        } catch (e: ConnectException) {
+            false
+        } catch (e: SocketTimeoutException) {
+            false
+        }
     }
 }
