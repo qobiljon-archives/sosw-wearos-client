@@ -13,7 +13,8 @@ interface ApiInterface {
     suspend fun signIn(@Body request: SignInRequest): Response<SignInResponse>
 
     @POST("submit_off_body")
-    suspend fun submitOffBodyData(@Header("Authorization") token: String, @Body submitOffBodyRequest: SubmitOffBodyRequest): Response<Void>
+    @Multipart
+    suspend fun submitOffBodyFile(@Header("Authorization") token: String, @Part file: MultipartBody.Part, @Part("value") name: RequestBody): Response<Void>
 
     @POST("submit_ppg")
     @Multipart

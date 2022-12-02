@@ -16,13 +16,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import io.github.qobiljon.stress.sensors.listeners.OffBodyListener
 import io.github.qobiljon.stress.R
-import io.github.qobiljon.stress.databinding.ActivityMainBinding
 import io.github.qobiljon.stress.core.api.ApiHelper
-import io.github.qobiljon.stress.core.database.DatabaseHelper
+import io.github.qobiljon.stress.databinding.ActivityMainBinding
+import io.github.qobiljon.stress.sensors.listeners.OffBodyListener
 import io.github.qobiljon.stress.sensors.services.DataCollectionService
 import io.github.qobiljon.stress.sensors.services.DataSubmissionService
+import io.github.qobiljon.stress.utils.Storage
 import io.github.qobiljon.stress.utils.Utils
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -154,7 +154,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (checkSelfPermission(Manifest.permission.BODY_SENSORS) == PackageManager.PERMISSION_GRANTED) {
-            if (DatabaseHelper.isAuthenticated(applicationContext)) {
+            if (Storage.isAuthenticated(applicationContext)) {
                 llAuthentication.visibility = View.GONE
                 llDateTime.visibility = View.VISIBLE
 

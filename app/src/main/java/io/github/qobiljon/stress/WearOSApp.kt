@@ -1,13 +1,13 @@
 package io.github.qobiljon.stress
 
 import android.app.Application
-import io.github.qobiljon.stress.core.database.DatabaseHelper
+import io.github.qobiljon.stress.utils.Storage
 
 
 class WearOSApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        DatabaseHelper.init(applicationContext)
+        Storage.init(applicationContext)
     }
 }

@@ -6,8 +6,7 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import io.github.qobiljon.stress.core.database.DatabaseHelper
-import io.github.qobiljon.stress.core.database.data.OffBody
+import io.github.qobiljon.stress.utils.Storage
 
 class OffBodyListener(private val context: Context) : SensorEventListener {
     companion object {
@@ -19,7 +18,7 @@ class OffBodyListener(private val context: Context) : SensorEventListener {
         if (event.values.isEmpty()) return
         val isOffBody = event.values[0] != 1.0f
 
-        DatabaseHelper.saveOffBodyReading(OffBody(timestamp = System.currentTimeMillis(), is_off_body = isOffBody))
+        Storage.saveOffBodyReading(timestamp = System.currentTimeMillis(), isOffBody = isOffBody)
 
         val intent = Intent(INTENT_FILTER)
         intent.putExtra(INTENT_KEY, isOffBody)

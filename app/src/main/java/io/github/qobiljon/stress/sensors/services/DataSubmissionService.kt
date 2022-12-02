@@ -8,8 +8,8 @@ import android.os.Binder
 import android.os.IBinder
 import android.util.Log
 import io.github.qobiljon.stress.R
-import io.github.qobiljon.stress.core.database.DatabaseHelper
 import io.github.qobiljon.stress.ui.MainActivity
+import io.github.qobiljon.stress.utils.Storage
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -59,7 +59,7 @@ class DataSubmissionService : Service() {
         if (isRunning) return START_STICKY
         isRunning = true
 
-        executor.scheduleAtFixedRate({ DatabaseHelper.syncToCloud(applicationContext) }, 0L, DATA_SUBMISSION_INTERVAL, TimeUnit.SECONDS)
+        executor.scheduleAtFixedRate({ Storage.syncToCloud(applicationContext) }, 0L, DATA_SUBMISSION_INTERVAL, TimeUnit.SECONDS)
         return START_STICKY
     }
 }
