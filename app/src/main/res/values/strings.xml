@@ -10,21 +10,21 @@
 
     <!-- Auth page details -->
     <string name="email">이메일</string>
-    <string name="password">Password</string>
+    <string name="password">패스워드</string>
     <string name="email_hint" translatable="false">example@email.com</string>
     <string name="password_hint" translatable="false">***</string>
 
     <!-- UI elements -->
-    <string name="start">start</string>
-    <string name="stop">stop</string>
+    <string name="start">시작</string>
+    <string name="stop">중지</string>
 
     <string name="dummyDate">Mon 01.01</string>
     <string name="dummyTime">12:00 AM</string>
 
-    <string name="on_body">(ON BODY)</string>
-    <string name="off_body">(OFF BODY)</string>
+    <string name="on_body">(손목 착용 성공)</string>
+    <string name="off_body">(손목 착용 실패)</string>
 
-    <string name="sign_in">Sign in</string>
-    <string name="sign_in_success">Signed in successfully</string>
-    <string name="sign_in_failure">Failed to sign in, please check your inputs and try again!</string>
+    <string name="sign_in">로그인</string>
+    <string name="sign_in_success">성공적으로 로그인 되었습니다</string>
+    <string name="sign_in_failure">로그인에 실패했습니다. 입력을 확인하고 다시 한 번 시도해주세요!</string>
 </resources>
