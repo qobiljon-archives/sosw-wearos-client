@@ -9,7 +9,7 @@
     <string name="room_db_name" translatable="false">app-database</string>
 
     <!-- Auth page details -->
-    <string name="email">Email</string>
+    <string name="email">이메일</string>
     <string name="password">Password</string>
     <string name="email_hint" translatable="false">example@email.com</string>
     <string name="password_hint" translatable="false">***</string>
