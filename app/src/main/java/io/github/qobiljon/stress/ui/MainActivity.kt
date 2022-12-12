@@ -132,6 +132,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onBackPressed() {
+
+    }
+
     @OptIn(DelicateCoroutinesApi::class)
     override fun onResume() {
         super.onResume()

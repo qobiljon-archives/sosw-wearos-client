@@ -5,7 +5,9 @@ import android.content.Intent
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
+import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import io.github.qobiljon.stress.ui.MainActivity
 import io.github.qobiljon.stress.utils.Storage
 
 class OffBodyListener(private val context: Context) : SensorEventListener {
@@ -17,6 +19,7 @@ class OffBodyListener(private val context: Context) : SensorEventListener {
     override fun onSensorChanged(event: SensorEvent) {
         if (event.values.isEmpty()) return
         val isOffBody = event.values[0] != 1.0f
+        Log.e(MainActivity.TAG, "${event.values[0]}, ${event.values[1]}")
 
         Storage.saveOffBodyReading(timestamp = System.currentTimeMillis(), isOffBody = isOffBody)
 
