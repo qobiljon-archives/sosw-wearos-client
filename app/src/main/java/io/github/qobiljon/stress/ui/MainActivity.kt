@@ -8,22 +8,16 @@ import android.os.IBinder
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
-import android.widget.Button
-import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.github.qobiljon.stress.R
-import io.github.qobiljon.stress.core.api.ApiHelper
 import io.github.qobiljon.stress.databinding.ActivityMainBinding
 import io.github.qobiljon.stress.sensors.listeners.OffBodyListener
 import io.github.qobiljon.stress.sensors.services.DataCollectionService
-import io.github.qobiljon.stress.sensors.services.DataSubmissionService
 import io.github.qobiljon.stress.utils.Storage
-import io.github.qobiljon.stress.utils.Utils
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -60,25 +54,6 @@ class MainActivity : AppCompatActivity() {
             collectSvcBound = false
         }
     }
-    private var submitSvc: DataSubmissionService? = null
-    private var submitSvcBound: Boolean = false
-    private val submitSvcCon = object : ServiceConnection {
-        override fun onServiceConnected(className: ComponentName, service: IBinder) {
-            val binder = service as DataSubmissionService.LocalBinder
-            submitSvc = binder.getService
-
-            if (!binder.getService.isRunning) {
-                val intent = Intent(applicationContext, DataSubmissionService::class.java)
-                startForegroundService(intent)
-            }
-
-            submitSvcBound = true
-        }
-
-        override fun onServiceDisconnected(className: ComponentName) {
-            submitSvcBound = false
-        }
-    }
 
     private val offBodyEventReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
@@ -102,34 +77,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-
-        llAuthentication = findViewById(R.id.llAuthentication)
-        llDateTime = findViewById(R.id.llDateTime)
-
-        val etEmail = findViewById<EditText>(R.id.etEmail)
-        val etPassword = findViewById<EditText>(R.id.etPassword)
-        val btnSignIn = findViewById<Button>(R.id.btnAuthenticate)
-
-        btnSignIn.setOnClickListener {
-            btnSignIn.isEnabled = false
-            lifecycleScope.launch {
-                val success = ApiHelper.signIn(
-                    applicationContext,
-                    email = etEmail.text.toString(),
-                    password = etPassword.text.toString(),
-                )
-                if (success) {
-                    llAuthentication.visibility = View.GONE
-                    llDateTime.visibility = View.VISIBLE
-                    btnSignIn.isEnabled = true
-
-                    Utils.toast(applicationContext, getString(R.string.sign_in_success))
-                } else {
-                    btnSignIn.isEnabled = true
-                    Utils.toast(applicationContext, getString(R.string.sign_in_failure))
-                }
-            }
-        }
     }
 
     override fun onBackPressed() {
@@ -164,8 +111,6 @@ class MainActivity : AppCompatActivity() {
 
                 val collectionIntent = Intent(applicationContext, DataCollectionService::class.java)
                 bindService(collectionIntent, collectSvcCon, BIND_AUTO_CREATE)
-                val submissionIntent = Intent(applicationContext, DataSubmissionService::class.java)
-                bindService(submissionIntent, submitSvcCon, BIND_AUTO_CREATE)
             }
         } else requestPermissions(arrayOf(Manifest.permission.BODY_SENSORS), PERMISSION_REQUEST_CODE)
     }
@@ -180,8 +125,6 @@ class MainActivity : AppCompatActivity() {
             else {
                 val collectionIntent = Intent(applicationContext, DataCollectionService::class.java)
                 bindService(collectionIntent, collectSvcCon, BIND_AUTO_CREATE)
-                val submissionIntent = Intent(applicationContext, DataSubmissionService::class.java)
-                bindService(submissionIntent, submitSvcCon, BIND_AUTO_CREATE)
             }
         }
     }

@@ -2,7 +2,7 @@
     <string name="app_name">Stress data collection app</string>
 
     <!-- API urls -->
-    <!--    <string name="api_base_url" translatable="false">http://20.0.0.65/api/</string>-->
+    <!--        <string name="api_base_url" translatable="false">http://20.0.0.65/api/</string>-->
     <string name="api_base_url" translatable="false">http://easytrack.ddns.net:40080/api/</string>
 
     <!-- Room -->
