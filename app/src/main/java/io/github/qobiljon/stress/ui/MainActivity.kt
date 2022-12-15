@@ -9,11 +9,8 @@ import android.util.Log
 import android.view.WindowManager
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.content.res.AppCompatResources
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.github.qobiljon.stress.R
 import io.github.qobiljon.stress.databinding.ActivityMainBinding
-import io.github.qobiljon.stress.sensors.listeners.OffBodyListener
 import io.github.qobiljon.stress.sensors.services.DataCollectionService
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -50,21 +47,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private val offBodyEventReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent) {
-            val isOffBody = intent.getBooleanExtra(OffBodyListener.INTENT_KEY, true)
-            val tvOffBody = findViewById<TextView>(R.id.tvOffBody)
-
-            if (isOffBody) {
-                tvOffBody.text = getString(R.string.off_body)
-                binding.root.background = AppCompatResources.getDrawable(applicationContext, R.drawable.orange_circle)
-            } else {
-                tvOffBody.text = getString(R.string.on_body)
-                binding.root.background = AppCompatResources.getDrawable(applicationContext, R.drawable.green_circle)
-            }
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -81,9 +63,6 @@ class MainActivity : AppCompatActivity() {
     @OptIn(DelicateCoroutinesApi::class)
     override fun onResume() {
         super.onResume()
-
-        val broadcastManager = LocalBroadcastManager.getInstance(applicationContext)
-        broadcastManager.registerReceiver(offBodyEventReceiver, IntentFilter(OffBodyListener.INTENT_FILTER))
 
         GlobalScope.launch {
             val tvDate = findViewById<TextView>(R.id.tvDate)
