@@ -6,9 +6,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
-import android.view.View
 import android.view.WindowManager
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
@@ -17,7 +15,6 @@ import io.github.qobiljon.stress.R
 import io.github.qobiljon.stress.databinding.ActivityMainBinding
 import io.github.qobiljon.stress.sensors.listeners.OffBodyListener
 import io.github.qobiljon.stress.sensors.services.DataCollectionService
-import io.github.qobiljon.stress.utils.Storage
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -33,8 +30,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var llAuthentication: LinearLayout
-    private lateinit var llDateTime: LinearLayout
     private var collectSvc: DataCollectionService? = null
     private var collectSvcBound: Boolean = false
     private val collectSvcCon = object : ServiceConnection {
@@ -105,13 +100,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (checkSelfPermission(Manifest.permission.BODY_SENSORS) == PackageManager.PERMISSION_GRANTED) {
-            if (Storage.isAuthenticated(applicationContext)) {
-                llAuthentication.visibility = View.GONE
-                llDateTime.visibility = View.VISIBLE
-
-                val collectionIntent = Intent(applicationContext, DataCollectionService::class.java)
-                bindService(collectionIntent, collectSvcCon, BIND_AUTO_CREATE)
-            }
+            val collectionIntent = Intent(applicationContext, DataCollectionService::class.java)
+            bindService(collectionIntent, collectSvcCon, BIND_AUTO_CREATE)
         } else requestPermissions(arrayOf(Manifest.permission.BODY_SENSORS), PERMISSION_REQUEST_CODE)
     }
 
