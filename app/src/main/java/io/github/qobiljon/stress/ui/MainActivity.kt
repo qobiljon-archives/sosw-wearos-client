@@ -21,7 +21,6 @@ import io.github.qobiljon.stress.core.api.ApiHelper
 import io.github.qobiljon.stress.databinding.ActivityMainBinding
 import io.github.qobiljon.stress.sensors.listeners.OffBodyListener
 import io.github.qobiljon.stress.sensors.services.DataCollectionService
-import io.github.qobiljon.stress.sensors.services.DataSubmissionService
 import io.github.qobiljon.stress.utils.Storage
 import io.github.qobiljon.stress.utils.Utils
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -60,25 +59,25 @@ class MainActivity : AppCompatActivity() {
             collectSvcBound = false
         }
     }
-    private var submitSvc: DataSubmissionService? = null
-    private var submitSvcBound: Boolean = false
-    private val submitSvcCon = object : ServiceConnection {
-        override fun onServiceConnected(className: ComponentName, service: IBinder) {
-            val binder = service as DataSubmissionService.LocalBinder
-            submitSvc = binder.getService
-
-            if (!binder.getService.isRunning) {
-                val intent = Intent(applicationContext, DataSubmissionService::class.java)
-                startForegroundService(intent)
-            }
-
-            submitSvcBound = true
-        }
-
-        override fun onServiceDisconnected(className: ComponentName) {
-            submitSvcBound = false
-        }
-    }
+//    private var submitSvc: DataSubmissionService? = null
+//    private var submitSvcBound: Boolean = false
+//    private val submitSvcCon = object : ServiceConnection {
+//        override fun onServiceConnected(className: ComponentName, service: IBinder) {
+//            val binder = service as DataSubmissionService.LocalBinder
+//            submitSvc = binder.getService
+//
+//            if (!binder.getService.isRunning) {
+//                val intent = Intent(applicationContext, DataSubmissionService::class.java)
+//                startForegroundService(intent)
+//            }
+//
+//            submitSvcBound = true
+//        }
+//
+//        override fun onServiceDisconnected(className: ComponentName) {
+//            submitSvcBound = false
+//        }
+//    }
 
     private val offBodyEventReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
@@ -164,8 +163,8 @@ class MainActivity : AppCompatActivity() {
 
                 val collectionIntent = Intent(applicationContext, DataCollectionService::class.java)
                 bindService(collectionIntent, collectSvcCon, BIND_AUTO_CREATE)
-                val submissionIntent = Intent(applicationContext, DataSubmissionService::class.java)
-                bindService(submissionIntent, submitSvcCon, BIND_AUTO_CREATE)
+                // val submissionIntent = Intent(applicationContext, DataSubmissionService::class.java)
+                // bindService(submissionIntent, submitSvcCon, BIND_AUTO_CREATE)
             }
         } else requestPermissions(arrayOf(Manifest.permission.BODY_SENSORS), PERMISSION_REQUEST_CODE)
     }
@@ -180,8 +179,8 @@ class MainActivity : AppCompatActivity() {
             else {
                 val collectionIntent = Intent(applicationContext, DataCollectionService::class.java)
                 bindService(collectionIntent, collectSvcCon, BIND_AUTO_CREATE)
-                val submissionIntent = Intent(applicationContext, DataSubmissionService::class.java)
-                bindService(submissionIntent, submitSvcCon, BIND_AUTO_CREATE)
+                // val submissionIntent = Intent(applicationContext, DataSubmissionService::class.java)
+                // bindService(submissionIntent, submitSvcCon, BIND_AUTO_CREATE)
             }
         }
     }
