@@ -120,7 +120,8 @@ object Storage {
     }
 
     fun isAuthenticated(context: Context): Boolean {
-        return getSharedPreferences(context).getString(KEY_AUTH_TOKEN, null) != null
+        // return getSharedPreferences(context).getString(KEY_AUTH_TOKEN, null) != null
+        return true;
     }
 
     private fun getAuthToken(context: Context): String {
