@@ -43,6 +43,7 @@ dependencies {
     implementation 'androidx.percentlayout:percentlayout:1.0.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation files('/Users/kobiljon/AndroidStudioProjects/stress-wearos/app/libs/priv-health-tracking.aar')
 
     // mvp
     def viewmodel_version = "2.5.1"
